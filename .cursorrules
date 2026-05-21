@@ -1,0 +1,40 @@
+# Job Application Screener — Cursor Rules
+
+## Project
+CPVC Build Night project. Node.js/Express backend + vanilla HTML/CSS/JS frontend.
+Screens job applicants using Groq's Llama 3.3 70B model.
+
+## Stack
+- Runtime: Node.js
+- Framework: Express (server.js)
+- AI: Groq SDK (groq-sdk package), model: llama-3.3-70b-versatile
+- Frontend: Vanilla HTML/CSS/JS in public/index.html — no frameworks, no build step
+- Config: dotenv, GROQ_API_KEY in .env (never commit .env)
+
+## File structure
+- server.js        — Express server + /screen POST endpoint + Groq API call
+- public/index.html — entire frontend (input form + results rendering in one file)
+- .env             — GROQ_API_KEY=... (local only, gitignored)
+- .env.example     — template, safe to commit
+
+## Running locally
+npm install && npm start
+Open http://localhost:3000
+
+## Key conventions
+- The /screen endpoint expects JSON body: { jobDescription, resume }
+- Groq response_format is json_object — always parse completion.choices[0].message.content
+- Frontend is a single page — results render in-place via JS, no page reload
+- Do not add a frontend framework or build tool unless explicitly asked
+- Do not commit .env or any API keys
+
+## Groq response shape
+{
+  decision: "ADVANCE" | "REJECT",
+  confidence: "High" | "Medium" | "Low",
+  summary: string,
+  scores: { skills_match, experience_level, education_fit, overall_fit }, // 0-100
+  strengths: string[],
+  gaps: string[],
+  decision_reason: string
+}
