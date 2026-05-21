@@ -121,10 +121,31 @@
     .candidate-num { font-size: 0.82rem; font-weight: 700; color: #4f46e5; background: #ede9fe; padding: 3px 10px; border-radius: 12px; }
     .candidate-name-input { flex: 1; margin: 0 12px; padding: 7px 12px; border: 1px solid #e5e7eb; border-radius: 7px; font-size: 0.85rem; font-family: inherit; transition: border-color 0.2s; }
     .candidate-name-input:focus { outline: none; border-color: #4f46e5; }
-    .candidate-entry textarea { width: 100%; height: 180px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.85rem; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.2s; }
+    .candidate-entry textarea { width: 100%; height: 140px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.85rem; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.2s; margin-top: 8px; }
     .candidate-entry textarea:focus { outline: none; border-color: #4f46e5; }
     .add-candidate-btn { width: 100%; padding: 11px; border: 2px dashed #d1d5db; border-radius: 10px; background: none; cursor: pointer; font-size: 0.88rem; color: #9ca3af; transition: all 0.2s; margin-bottom: 20px; }
     .add-candidate-btn:hover { border-color: #4f46e5; color: #4f46e5; background: #fafafe; }
+
+    /* DROP ZONE */
+    .drop-zone { border: 2px dashed #d1d5db; border-radius: 10px; transition: all 0.2s; background: #fafafa; }
+    .drop-zone.dragover { border-color: #4f46e5; background: #f0effe; }
+    .drop-zone-empty { padding: 28px 20px; text-align: center; cursor: pointer; }
+    .drop-zone-empty .dz-icon { font-size: 2rem; margin-bottom: 8px; }
+    .drop-zone-empty .dz-title { font-size: 0.9rem; font-weight: 600; color: #374151; margin-bottom: 4px; }
+    .drop-zone-empty .dz-sub { font-size: 0.78rem; color: #9ca3af; margin-bottom: 12px; }
+    .drop-zone-empty .dz-btn { background: white; border: 1px solid #d1d5db; padding: 7px 16px; border-radius: 7px; font-size: 0.83rem; cursor: pointer; color: #374151; transition: background 0.2s; }
+    .drop-zone-empty .dz-btn:hover { background: #f3f4f6; }
+    .drop-zone-loading { padding: 28px 20px; text-align: center; color: #6b7280; font-size: 0.88rem; }
+    .mini-spinner { width: 24px; height: 24px; border: 3px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+    .drop-zone-loaded { padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+    .dz-file-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .dz-file-info { flex: 1; min-width: 0; }
+    .dz-file-name { font-size: 0.88rem; font-weight: 600; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dz-file-preview { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dz-clear-btn { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; }
+    .dz-clear-btn:hover { color: #dc2626; }
+    .paste-toggle { background: none; border: none; font-size: 0.75rem; color: #9ca3af; cursor: pointer; text-decoration: underline; margin-top: 6px; padding: 0; }
+    .paste-toggle:hover { color: #4f46e5; }
     .screen-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
 
     /* ── LOADING ── */
@@ -680,9 +701,13 @@
   }
 
   // ── CANDIDATE INPUTS ──────────────────────────────────
+  // keyed by candidate input id → extracted resume text
+  const resumeTexts = {};
+
   function resetCandidateInputs() {
     candidateInputCount = 0;
     document.getElementById('candidates-input-list').innerHTML = '';
+    Object.keys(resumeTexts).forEach(k => delete resumeTexts[k]);
     addCandidateInput();
     updateScreenBtn();
   }
@@ -700,12 +725,40 @@
         <input class="candidate-name-input" type="text" placeholder="Name or label (optional)" id="cname-${id}" />
         ${id > 1 ? `<button class="btn-ghost danger" onclick="removeCandidateInput(${id})">✕</button>` : ''}
       </div>
-      <textarea id="cresume-${id}" placeholder="Paste resume text here..."></textarea>`;
+      <input type="file" id="fileinput-${id}" accept=".pdf,.docx,.txt" style="display:none" onchange="handleFileSelect(event,${id})" />
+      <div class="drop-zone" id="dropzone-${id}"
+           ondragover="handleDragOver(event,${id})"
+           ondragleave="handleDragLeave(event,${id})"
+           ondrop="handleDrop(event,${id})"
+           onclick="document.getElementById('fileinput-${id}').click()">
+        <div class="drop-zone-empty" id="dz-empty-${id}">
+          <div class="dz-icon">📄</div>
+          <div class="dz-title">Drop resume file here</div>
+          <div class="dz-sub">PDF, DOCX, or TXT · or click to browse</div>
+          <button type="button" class="dz-btn" onclick="event.stopPropagation();document.getElementById('fileinput-${id}').click()">Browse Files</button>
+        </div>
+        <div class="drop-zone-loading" id="dz-loading-${id}" style="display:none">
+          <div class="mini-spinner"></div>Extracting text from file...
+        </div>
+        <div class="drop-zone-loaded" id="dz-loaded-${id}" style="display:none">
+          <div class="dz-file-icon">📄</div>
+          <div class="dz-file-info">
+            <div class="dz-file-name" id="dz-fname-${id}"></div>
+            <div class="dz-file-preview" id="dz-fpreview-${id}"></div>
+          </div>
+          <button class="dz-clear-btn" title="Remove" onclick="event.stopPropagation();clearFile(${id})">✕</button>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <button class="paste-toggle" onclick="togglePasteMode(${id})">or paste text instead</button>
+      </div>
+      <textarea id="cresume-${id}" placeholder="Paste resume text here..." style="display:none;"></textarea>`;
     list.appendChild(el);
     updateScreenBtn();
   }
 
   function removeCandidateInput(id) {
+    delete resumeTexts[id];
     document.getElementById(`cinput-${id}`).remove();
     updateScreenBtn();
   }
@@ -721,11 +774,88 @@
   function getCandidateInputs() {
     return Array.from(document.querySelectorAll('.candidate-entry')).map(el => {
       const id = el.id.replace('cinput-', '');
+      const pasteText = document.getElementById(`cresume-${id}`)?.value.trim() || '';
       return {
         name: document.getElementById(`cname-${id}`)?.value.trim() || '',
-        resume: document.getElementById(`cresume-${id}`)?.value.trim() || '',
+        resume: resumeTexts[id] || pasteText,
       };
     });
+  }
+
+  // ── FILE HANDLING ─────────────────────────────────────
+  function handleDragOver(e, id) {
+    e.preventDefault();
+    document.getElementById(`dropzone-${id}`).classList.add('dragover');
+  }
+
+  function handleDragLeave(e, id) {
+    document.getElementById(`dropzone-${id}`).classList.remove('dragover');
+  }
+
+  function handleDrop(e, id) {
+    e.preventDefault();
+    document.getElementById(`dropzone-${id}`).classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) uploadFile(file, id);
+  }
+
+  function handleFileSelect(e, id) {
+    const file = e.target.files[0];
+    if (file) uploadFile(file, id);
+  }
+
+  function togglePasteMode(id) {
+    const ta = document.getElementById(`cresume-${id}`);
+    const dz = document.getElementById(`dropzone-${id}`);
+    const btn = document.querySelector(`#cinput-${id} .paste-toggle`);
+    const pasteVisible = ta.style.display !== 'none';
+    ta.style.display = pasteVisible ? 'none' : 'block';
+    dz.style.display = pasteVisible ? 'block' : 'none';
+    btn.textContent = pasteVisible ? 'or paste text instead' : 'or upload a file instead';
+  }
+
+  async function uploadFile(file, id) {
+    const allowed = ['.pdf', '.docx', '.txt'];
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!allowed.includes(ext)) {
+      alert(`Unsupported file type: ${ext}. Use PDF, DOCX, or TXT.`);
+      return;
+    }
+
+    document.getElementById(`dz-empty-${id}`).style.display = 'none';
+    document.getElementById(`dz-loaded-${id}`).style.display = 'none';
+    document.getElementById(`dz-loading-${id}`).style.display = 'block';
+
+    // auto-fill name from filename if empty
+    const nameInput = document.getElementById(`cname-${id}`);
+    if (!nameInput.value.trim()) {
+      nameInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/parse', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Parse failed');
+
+      resumeTexts[id] = data.text;
+      document.getElementById(`dz-fname-${id}`).textContent = data.filename;
+      document.getElementById(`dz-fpreview-${id}`).textContent = data.text.substring(0, 100) + '…';
+      document.getElementById(`dz-loading-${id}`).style.display = 'none';
+      document.getElementById(`dz-loaded-${id}`).style.display = 'flex';
+    } catch (err) {
+      document.getElementById(`dz-loading-${id}`).style.display = 'none';
+      document.getElementById(`dz-empty-${id}`).style.display = 'block';
+      alert('Could not read file: ' + err.message);
+    }
+  }
+
+  function clearFile(id) {
+    delete resumeTexts[id];
+    document.getElementById(`dz-loaded-${id}`).style.display = 'none';
+    document.getElementById(`dz-empty-${id}`).style.display = 'block';
+    document.getElementById(`fileinput-${id}`).value = '';
   }
 
   // ── SCREENING ─────────────────────────────────────────
