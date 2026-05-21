@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const multer  = require('multer');
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.mjs');
+const PDFParser = require('pdf2json');
 const mammoth  = require('mammoth');
 const Groq = require('groq-sdk');
 
@@ -19,15 +19,16 @@ app.post('/parse', upload.single('file'), async (req, res) => {
   try {
     let text = '';
     if (mimetype === 'application/pdf' || originalname.endsWith('.pdf')) {
-      const uint8 = new Uint8Array(buffer);
-      const pdf = await pdfjsLib.getDocument({ data: uint8, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: true }).promise;
-      const pages = [];
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        pages.push(content.items.map(item => item.str).join(' '));
-      }
-      text = pages.join('\n');
+      text = await new Promise((resolve, reject) => {
+        const parser = new PDFParser(null, 1);
+        parser.on('pdfParser_dataReady', () => {
+          resolve(parser.getRawTextContent());
+        });
+        parser.on('pdfParser_dataError', err => {
+          reject(new Error(err.parserError || 'PDF parse error'));
+        });
+        parser.parseBuffer(buffer);
+      });
     } else if (
       mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
       originalname.endsWith('.docx')
