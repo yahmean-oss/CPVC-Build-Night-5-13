@@ -1,350 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job Application Screener</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] }
+        }
+      }
+    }
+  </script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f6f9; color: #1a1a2e; min-height: 100vh; }
+    * { font-family: 'Inter', ui-sans-serif, system-ui; }
 
-    header { background: #1a1a2e; color: white; padding: 18px 40px; display: flex; align-items: center; justify-content: space-between; }
-    header h1 { font-size: 1.3rem; font-weight: 700; cursor: pointer; }
-    header h1:hover { opacity: 0.85; }
-    header span { font-size: 0.82rem; color: #8899bb; }
-
-    .container { max-width: 1060px; margin: 36px auto; padding: 0 24px; }
+    /* View show/hide — managed by showView() */
     .view { display: none; }
     .view.active { display: block; }
 
-    /* BUTTONS */
-    .btn-primary { background: #4f46e5; color: white; border: none; padding: 11px 22px; font-size: 0.93rem; font-weight: 600; border-radius: 9px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-    .btn-primary:hover { background: #4338ca; }
-    .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
-    .btn-success { background: #059669; color: white; border: none; padding: 11px 22px; font-size: 0.93rem; font-weight: 600; border-radius: 9px; cursor: pointer; transition: background 0.2s; }
-    .btn-success:hover { background: #047857; }
-    .btn-danger { background: #dc2626; color: white; border: none; padding: 11px 22px; font-size: 0.93rem; font-weight: 600; border-radius: 9px; cursor: pointer; transition: background 0.2s; }
-    .btn-danger:hover { background: #b91c1c; }
-    .btn-secondary { background: white; color: #374151; border: 1px solid #d1d5db; padding: 10px 18px; font-size: 0.88rem; font-weight: 500; border-radius: 9px; cursor: pointer; transition: background 0.2s; }
-    .btn-secondary:hover { background: #f9fafb; }
-    .btn-ghost { background: none; border: none; color: #6b7280; font-size: 0.85rem; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.2s, color 0.2s; }
-    .btn-ghost:hover { background: #f3f4f6; color: #374151; }
-    .btn-ghost.danger:hover { background: #fee2e2; color: #dc2626; }
-
-    /* CARDS */
-    .card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; }
-    .card h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; margin-bottom: 14px; }
-
-    /* VIEW HEADER */
-    .view-header { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; flex-wrap: wrap; }
-    .view-header h2 { font-size: 1.45rem; font-weight: 700; }
-
-    /* ── HOME ── */
-    .home-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
-    .home-header h2 { font-size: 1.6rem; font-weight: 700; }
-    .home-header p { color: #6b7280; font-size: 0.93rem; margin-top: 4px; }
-    .jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
-    .job-card { background: white; border: 2px solid #e5e7eb; border-radius: 14px; padding: 22px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
-    .job-card:hover { border-color: #4f46e5; box-shadow: 0 4px 16px rgba(79,70,229,0.1); }
-    .job-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-    .job-card-icon { width: 40px; height: 40px; background: #ede9fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-    .job-card-actions { display: flex; gap: 4px; }
-    .job-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: #1a1a2e; text-transform: none; letter-spacing: 0; }
-    .job-card p { font-size: 0.82rem; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .job-card-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; }
-    .job-card-date { font-size: 0.78rem; color: #9ca3af; }
-    .job-card-stats { display: flex; gap: 10px; margin-top: 10px; }
-    .stat-chip { font-size: 0.75rem; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
-    .stat-chip.green { background: #d1fae5; color: #065f46; }
-    .stat-chip.red { background: #fee2e2; color: #991b1b; }
-    .stat-chip.gray { background: #f3f4f6; color: #6b7280; }
-    .empty-state { text-align: center; padding: 80px 20px; color: #9ca3af; grid-column: 1/-1; }
-    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; }
-    .empty-state h3 { font-size: 1.2rem; color: #6b7280; margin-bottom: 8px; }
-    .empty-state p { font-size: 0.9rem; margin-bottom: 24px; }
-
-    /* ── CREATE/EDIT ── */
-    .form-group { margin-bottom: 18px; }
-    .form-group label { display: block; font-weight: 600; font-size: 0.88rem; color: #374151; margin-bottom: 7px; }
-    .form-group input[type="text"] { width: 100%; padding: 11px 13px; border: 2px solid #e5e7eb; border-radius: 9px; font-size: 0.93rem; font-family: inherit; transition: border-color 0.2s; }
-    .form-group input[type="text"]:focus { outline: none; border-color: #4f46e5; }
-    .form-group textarea { width: 100%; padding: 13px; border: 2px solid #e5e7eb; border-radius: 9px; font-size: 0.88rem; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.2s; }
-    .form-group textarea:focus { outline: none; border-color: #4f46e5; }
-    input::placeholder, textarea::placeholder { color: #9ca3af; }
-    .form-actions { display: flex; gap: 12px; }
-
-    /* ── JOB DETAIL ── */
-    .job-detail-banner { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    .job-detail-banner h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
-    .job-detail-banner p { font-size: 0.85rem; color: #6b7280; line-height: 1.5; max-width: 600px; }
-    .detail-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
-    .detail-stat { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 20px; text-align: center; min-width: 90px; }
-    .detail-stat .num { font-size: 1.5rem; font-weight: 800; }
-    .detail-stat .lbl { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
-
-    .candidates-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
-    .candidates-section-header h3 { font-size: 1rem; font-weight: 700; }
-
-    .candidate-row { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.15s; flex-wrap: wrap; }
-    .candidate-row:hover { border-color: #4f46e5; box-shadow: 0 2px 8px rgba(79,70,229,0.08); }
-    .score-circle { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; flex-shrink: 0; }
-    .candidate-row-info { flex: 1; min-width: 120px; }
-    .candidate-row-info .cname { font-size: 0.95rem; font-weight: 700; }
-    .candidate-row-info .cdate { font-size: 0.78rem; color: #9ca3af; margin-top: 2px; }
-    .threshold-badge { font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 10px; }
-    .threshold-badge.pass { background: #d1fae5; color: #065f46; }
-    .threshold-badge.fail { background: #fee2e2; color: #991b1b; }
-    .status-badge { font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 10px; }
-    .status-badge.pending  { background: #f3f4f6; color: #6b7280; }
-    .status-badge.advanced { background: #d1fae5; color: #065f46; }
-    .status-badge.denied   { background: #fee2e2; color: #991b1b; }
-    .ai-badge { font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
-    .ai-badge.advance { background: #ede9fe; color: #4c1d95; }
-    .ai-badge.reject  { background: #fef3c7; color: #92400e; }
-
-    /* FILTER BAR */
-    .filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    .filter-chip { padding: 5px 13px; border-radius: 16px; font-size: 0.78rem; font-weight: 600; border: 1.5px solid #e5e7eb; background: white; cursor: pointer; transition: all 0.15s; color: #6b7280; }
-    .filter-chip:hover { border-color: #4f46e5; color: #4f46e5; }
-    .filter-chip.active { background: #4f46e5; border-color: #4f46e5; color: white; }
-    .filter-chip.active-green  { background: #059669; border-color: #059669; color: white; }
-    .filter-chip.active-red    { background: #dc2626; border-color: #dc2626; color: white; }
-    .filter-chip.active-gray   { background: #6b7280; border-color: #6b7280; color: white; }
-    .filter-chip.active-yellow { background: #d97706; border-color: #d97706; color: white; }
-    .sort-select { margin-left: auto; padding: 5px 10px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 0.78rem; font-family: inherit; color: #374151; background: white; cursor: pointer; }
-
-    /* NOTES */
-    .notes-textarea { width: 100%; min-height: 90px; padding: 12px; border: 1.5px solid #e5e7eb; border-radius: 9px; font-size: 0.88rem; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.2s; }
-    .notes-textarea:focus { outline: none; border-color: #4f46e5; }
-    .notes-saved { font-size: 0.75rem; color: #10b981; margin-top: 6px; display: none; }
-
-    /* QUESTIONS */
-    .question-item { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
-    .question-item:last-child { border-bottom: none; }
-    .question-category { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #9ca3af; margin-bottom: 4px; }
-    .question-text { font-size: 0.92rem; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; line-height: 1.5; }
-    .question-why { font-size: 0.8rem; color: #6b7280; font-style: italic; }
-    .gen-btn { background: #ede9fe; color: #3730a3; border: 1px solid #c4b5fd; padding: 9px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .gen-btn:hover { background: #4f46e5; color: white; border-color: #4f46e5; }
-    .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .gen-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
-
-    /* EMAIL DRAFT */
-    .email-subject { font-size: 0.82rem; font-weight: 700; color: #374151; margin-bottom: 6px; }
-    .email-subject span { font-weight: 400; color: #1a1a2e; }
-    .email-body { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; font-size: 0.88rem; line-height: 1.7; color: #374151; white-space: pre-wrap; margin-bottom: 10px; }
-    .email-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .regen-btn { background: none; border: 1px solid #e5e7eb; padding: 6px 14px; border-radius: 7px; font-size: 0.8rem; cursor: pointer; color: #6b7280; transition: background 0.2s; }
-    .regen-btn:hover { background: #f3f4f6; }
-
-    /* ── SCREEN VIEW ── */
-    .screen-job-banner { background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 10px; padding: 13px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .screen-job-banner span { font-size: 0.9rem; color: #4c1d95; font-weight: 600; }
-    .screen-job-banner small { font-size: 0.78rem; color: #7c3aed; }
-    .strictness-bar { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 13px 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-    .strictness-bar label { font-size: 0.88rem; font-weight: 600; color: #374151; white-space: nowrap; }
-    .strictness-options { display: flex; gap: 8px; }
-    .strictness-btn { padding: 6px 16px; border-radius: 20px; font-size: 0.83rem; font-weight: 600; border: 2px solid #e5e7eb; background: white; cursor: pointer; transition: all 0.15s; color: #6b7280; }
-    .strictness-btn.active-lenient  { border-color: #10b981; background: #d1fae5; color: #065f46; }
-    .strictness-btn.active-balanced { border-color: #4f46e5; background: #ede9fe; color: #3730a3; }
-    .strictness-btn.active-strict   { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
-    .strictness-desc { font-size: 0.8rem; color: #9ca3af; }
-    .candidates-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .candidates-label span { font-size: 0.88rem; font-weight: 600; color: #374151; }
-    .candidate-entry { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 10px; }
-    .candidate-entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .candidate-num { font-size: 0.82rem; font-weight: 700; color: #4f46e5; background: #ede9fe; padding: 3px 10px; border-radius: 12px; }
-    .candidate-name-input { flex: 1; margin: 0 12px; padding: 7px 12px; border: 1px solid #e5e7eb; border-radius: 7px; font-size: 0.85rem; font-family: inherit; transition: border-color 0.2s; }
-    .candidate-name-input:focus { outline: none; border-color: #4f46e5; }
-    .candidate-entry textarea { width: 100%; height: 140px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.85rem; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.2s; margin-top: 8px; }
-    .candidate-entry textarea:focus { outline: none; border-color: #4f46e5; }
-    .add-candidate-btn { width: 100%; padding: 11px; border: 2px dashed #d1d5db; border-radius: 10px; background: none; cursor: pointer; font-size: 0.88rem; color: #9ca3af; transition: all 0.2s; margin-bottom: 20px; }
-    .add-candidate-btn:hover { border-color: #4f46e5; color: #4f46e5; background: #fafafe; }
-
-    /* DROP ZONE */
-    .drop-zone { border: 2px dashed #d1d5db; border-radius: 10px; transition: all 0.2s; background: #fafafa; }
-    .drop-zone.dragover { border-color: #4f46e5; background: #f0effe; }
-    .drop-zone-empty { padding: 28px 20px; text-align: center; cursor: pointer; }
-    .drop-zone-empty .dz-icon { font-size: 2rem; margin-bottom: 8px; }
-    .drop-zone-empty .dz-title { font-size: 0.9rem; font-weight: 600; color: #374151; margin-bottom: 4px; }
-    .drop-zone-empty .dz-sub { font-size: 0.78rem; color: #9ca3af; margin-bottom: 12px; }
-    .drop-zone-empty .dz-btn { background: white; border: 1px solid #d1d5db; padding: 7px 16px; border-radius: 7px; font-size: 0.83rem; cursor: pointer; color: #374151; transition: background 0.2s; }
-    .drop-zone-empty .dz-btn:hover { background: #f3f4f6; }
-    .drop-zone-loading { padding: 28px 20px; text-align: center; color: #6b7280; font-size: 0.88rem; }
-    .mini-spinner { width: 24px; height: 24px; border: 3px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
-    .drop-zone-loaded { padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
-    .dz-file-icon { font-size: 1.6rem; flex-shrink: 0; }
-    .dz-file-info { flex: 1; min-width: 0; }
-    .dz-file-name { font-size: 0.88rem; font-weight: 600; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .dz-file-preview { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .dz-clear-btn { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; }
-    .dz-clear-btn:hover { color: #dc2626; }
-    .paste-toggle { background: none; border: none; font-size: 0.75rem; color: #9ca3af; cursor: pointer; text-decoration: underline; margin-top: 6px; padding: 0; }
-    .paste-toggle:hover { color: #4f46e5; }
-    .screen-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
-
-    /* BATCH UPLOAD ZONE */
-    .batch-upload-zone { border: 2px dashed #c4b5fd; border-radius: 12px; background: #faf8ff; padding: 32px 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 20px; }
-    .batch-upload-zone:hover, .batch-upload-zone.dragover { border-color: #4f46e5; background: #f0effe; }
-    .batch-upload-zone .bz-icon { font-size: 2.2rem; margin-bottom: 10px; }
-    .batch-upload-zone .bz-title { font-size: 1rem; font-weight: 700; color: #3730a3; margin-bottom: 4px; }
-    .batch-upload-zone .bz-sub { font-size: 0.82rem; color: #7c3aed; margin-bottom: 14px; }
-    .batch-upload-zone .bz-btn { background: #4f46e5; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .batch-upload-zone .bz-btn:hover { background: #4338ca; }
-    .batch-parse-progress { background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 10px; padding: 16px 20px; margin-bottom: 16px; display: none; }
-    .batch-parse-progress .bp-label { font-size: 0.88rem; font-weight: 600; color: #3730a3; margin-bottom: 8px; }
-    .batch-progress-bar-wrap { height: 6px; background: #ddd6fe; border-radius: 3px; overflow: hidden; }
-    .batch-progress-bar { height: 100%; background: #4f46e5; border-radius: 3px; transition: width 0.3s; }
-    .batch-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .batch-section-header span { font-size: 0.88rem; font-weight: 600; color: #374151; }
-    .clear-all-btn { background: none; border: none; font-size: 0.78rem; color: #9ca3af; cursor: pointer; text-decoration: underline; }
-    .clear-all-btn:hover { color: #dc2626; }
-
-    /* ── LOADING ── */
-    #loading-view { text-align: center; padding: 80px 20px; color: #6b7280; }
-    .spinner { width: 44px; height: 44px; border: 4px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    /* Spinner */
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-progress { font-size: 0.85rem; color: #9ca3af; margin-top: 8px; }
+    .spinner { animation: spin 0.8s linear infinite; }
 
-    /* ── CANDIDATE PROFILE ── */
-    .score-hero { background: white; border: 1px solid #e5e7eb; border-radius: 14px; padding: 28px; margin-bottom: 18px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
-    .score-big-circle { width: 90px; height: 90px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
-    .score-big-circle .big-num { font-size: 2rem; font-weight: 900; line-height: 1; }
-    .score-big-circle .big-lbl { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-    .score-hero-info { flex: 1; }
-    .score-hero-info h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
-    .score-hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-    .threshold-big { font-size: 0.85rem; font-weight: 700; padding: 5px 14px; border-radius: 20px; }
-    .threshold-big.pass { background: #d1fae5; color: #065f46; }
-    .threshold-big.fail { background: #fee2e2; color: #991b1b; }
-    .score-hero-reason { font-size: 0.9rem; color: #6b7280; line-height: 1.5; }
+    /* Filter chips — JS adds/removes active classes */
+    .filter-chip {
+      display: inline-flex; align-items: center; padding: 5px 14px;
+      border-radius: 999px; font-size: 0.78rem; font-weight: 600;
+      border: 1.5px solid #e5e7eb; background: white;
+      cursor: pointer; transition: all 0.15s; color: #6b7280;
+    }
+    .filter-chip:hover { border-color: #7c3aed; color: #7c3aed; }
+    .filter-chip.active         { background: #7c3aed; border-color: #7c3aed; color: white; }
+    .filter-chip.active-green   { background: #059669; border-color: #059669; color: white; }
+    .filter-chip.active-red     { background: #dc2626; border-color: #dc2626; color: white; }
+    .filter-chip.active-gray    { background: #6b7280; border-color: #6b7280; color: white; }
+    .filter-chip.active-yellow  { background: #d97706; border-color: #d97706; color: white; }
 
-    .decision-actions { display: flex; align-items: center; flex-direction: column; gap: 8px; flex-shrink: 0; }
-    .decision-actions label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; }
-    .decision-btns { display: flex; gap: 8px; }
-    .decision-btn { padding: 10px 18px; border: 2px solid transparent; border-radius: 9px; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    /* Strictness buttons — JS toggles active-* classes */
+    .strictness-btn {
+      padding: 6px 18px; border-radius: 999px; font-size: 0.83rem; font-weight: 600;
+      border: 2px solid #e5e7eb; background: white; cursor: pointer;
+      transition: all 0.15s; color: #6b7280;
+    }
+    .strictness-btn.active-lenient  { border-color: #10b981; background: #d1fae5; color: #065f46; }
+    .strictness-btn.active-balanced { border-color: #7c3aed; background: #ede9fe; color: #5b21b6; }
+    .strictness-btn.active-strict   { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
+
+    /* Decision buttons — JS toggles .selected */
+    .decision-btn {
+      padding: 9px 16px; border: 2px solid transparent; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+    }
     .decision-btn.advance-btn { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
-    .decision-btn.advance-btn:hover, .decision-btn.advance-btn.selected { background: #059669; color: white; border-color: #059669; }
-    .decision-btn.deny-btn { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-    .decision-btn.deny-btn:hover, .decision-btn.deny-btn.selected { background: #dc2626; color: white; border-color: #dc2626; }
+    .decision-btn.advance-btn:hover,
+    .decision-btn.advance-btn.selected  { background: #059669; color: white; border-color: #059669; }
+    .decision-btn.deny-btn    { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+    .decision-btn.deny-btn:hover,
+    .decision-btn.deny-btn.selected     { background: #dc2626; color: white; border-color: #dc2626; }
     .decision-btn.pending-btn { background: #f3f4f6; color: #6b7280; border-color: #e5e7eb; }
-    .decision-btn.pending-btn.selected { background: #6b7280; color: white; border-color: #6b7280; }
+    .decision-btn.pending-btn.selected  { background: #6b7280; color: white; border-color: #6b7280; }
 
-    .candidate-profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    @media (max-width: 700px) { .candidate-profile-grid { grid-template-columns: 1fr; } }
+    /* Drop zones — JS toggles .dragover */
+    .drop-zone.dragover        { border-color: #7c3aed !important; background: #f5f3ff !important; }
+    .batch-upload-zone.dragover { border-color: #7c3aed !important; background: #f5f3ff !important; }
 
-    .pros-cons { list-style: none; }
-    .pros-cons li { padding: 6px 0; font-size: 0.88rem; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
-    .pros-cons li:last-child { border-bottom: none; }
-    .pros-cons .dot { margin-top: 6px; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .pro-dot  { background: #10b981; }
-    .con-dot  { background: #f59e0b; }
-
-    .score-row { display: flex; align-items: center; margin-bottom: 10px; }
-    .score-label { font-size: 0.86rem; color: #374151; width: 128px; }
-    .score-bar-wrap { flex: 1; height: 8px; background: #f3f4f6; border-radius: 4px; margin: 0 10px; overflow: hidden; }
+    /* Score bar animation */
     .score-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
-    .score-num { font-size: 0.86rem; font-weight: 600; width: 30px; text-align: right; }
 
-    .summary-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; margin-bottom: 16px; }
-    .summary-card h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; margin-bottom: 10px; }
-    .summary-card p { font-size: 0.92rem; line-height: 1.7; color: #374151; }
-    .copy-btn { margin-top: 10px; background: #f3f4f6; border: 1px solid #e5e7eb; padding: 7px 14px; border-radius: 7px; font-size: 0.82rem; cursor: pointer; transition: background 0.2s; color: #374151; }
-    .copy-btn:hover { background: #e5e7eb; }
-
-    .resume-toggle { background: none; border: 1px solid #e5e7eb; padding: 8px 16px; border-radius: 8px; font-size: 0.83rem; cursor: pointer; color: #6b7280; margin-bottom: 10px; transition: background 0.2s; }
-    .resume-toggle:hover { background: #f3f4f6; }
-    .resume-text { display: none; background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; font-size: 0.82rem; line-height: 1.7; color: #6b7280; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
-
-    /* ── BATCH RESULTS ── */
-    .batch-summary-bar { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 18px; display: flex; gap: 28px; flex-wrap: wrap; margin-bottom: 20px; }
-    .batch-stat { text-align: center; }
-    .batch-stat .num { font-size: 1.5rem; font-weight: 800; color: #1e40af; }
-    .batch-stat .lbl { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
-    .rank-table { width: 100%; border-collapse: collapse; }
-    .rank-table th { text-align: left; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #9ca3af; padding: 10px 12px; border-bottom: 2px solid #f3f4f6; }
-    .rank-table td { padding: 12px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
-    .rank-table tr:last-child td { border-bottom: none; }
-    .rank-table tbody tr:hover td { background: #fafafa; cursor: pointer; }
-    .rank-num { font-size: 1.1rem; font-weight: 800; color: #d1d5db; }
-    .rank-num.gold { color: #f59e0b; }
-    .rank-num.silver { color: #9ca3af; }
-    .rank-num.bronze { color: #cd7c54; }
-    .decision-pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; }
-    .decision-pill.advance { background: #d1fae5; color: #065f46; }
-    .decision-pill.reject  { background: #fee2e2; color: #991b1b; }
-    .mini-bar-wrap { width: 70px; height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
-    .mini-bar { height: 100%; border-radius: 3px; }
-
-    .error-box { background: #fee2e2; border: 1px solid #fca5a5; border-radius: 10px; padding: 13px 16px; color: #991b1b; font-size: 0.9rem; display: none; margin-top: 12px; }
-    .info-bar { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; font-size: 0.87rem; color: #1e40af; margin-bottom: 16px; }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
   </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
 
-<header>
-  <h1 onclick="showHome()">Job Application Screener</h1>
-  <span>Powered by Groq · Llama 3.3</span>
+<!-- ── HEADER ─────────────────────────────────────────── -->
+<header class="bg-gradient-to-r from-violet-900 via-violet-800 to-indigo-800 text-white px-8 py-4 flex items-center justify-between shadow-xl sticky top-0 z-50">
+  <div class="flex items-center gap-3 cursor-pointer select-none" onclick="showHome()">
+    <div class="w-9 h-9 bg-white/15 rounded-xl flex items-center justify-center text-xl font-bold shadow-inner">🎯</div>
+    <div>
+      <div class="text-base font-bold tracking-tight leading-none">Job Application Screener</div>
+      <div class="text-xs text-violet-300 mt-0.5 font-medium">AI-Powered Candidate Screening</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <span class="bg-white/10 border border-white/20 text-violet-200 text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">
+      ⚡ Groq · Llama 3.3
+    </span>
+  </div>
 </header>
 
-<div class="container">
+<div class="max-w-5xl mx-auto px-6 py-8">
 
-  <!-- HOME -->
+  <!-- ── HOME ───────────────────────────────────────────── -->
   <div id="home-view" class="view active">
-    <div class="home-header">
-      <div><h2>Job Profiles</h2><p>Select a role to screen candidates or review past results.</p></div>
-      <button class="btn-primary" onclick="showCreate()">+ New Job Profile</button>
-    </div>
-    <div id="jobs-grid" class="jobs-grid"></div>
-  </div>
-
-  <!-- CREATE / EDIT -->
-  <div id="create-view" class="view">
-    <div class="view-header">
-      <button class="btn-secondary" onclick="goBackFromCreate()">← Back</button>
-      <h2 id="create-view-title">New Job Profile</h2>
-    </div>
-    <div class="form-group">
-      <label for="profile-name">Role Title</label>
-      <input type="text" id="profile-name" placeholder="e.g. Senior Software Engineer, Marketing Manager" />
-    </div>
-    <div class="form-group">
-      <label for="profile-jd">Job Description</label>
-      <textarea id="profile-jd" style="height:360px;" placeholder="Paste the full job description here. Saved and reused every time you screen a candidate for this role."></textarea>
-    </div>
-    <div class="form-actions">
-      <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
-      <button class="btn-secondary" onclick="goBackFromCreate()">Cancel</button>
-    </div>
-    <div class="error-box" id="create-error"></div>
-  </div>
-
-  <!-- JOB DETAIL -->
-  <div id="job-detail-view" class="view">
-    <div class="view-header">
-      <button class="btn-secondary" onclick="showHome()">← All Jobs</button>
-      <h2 id="job-detail-title"></h2>
-      <button class="btn-ghost" onclick="showCreate(currentProfileId)" style="margin-left:auto;">✏️ Edit</button>
-    </div>
-    <div class="job-detail-banner">
+    <div class="flex items-start justify-between mb-8 flex-wrap gap-4">
       <div>
-        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin-bottom:6px;">Job Description</div>
-        <p id="job-detail-jd-preview"></p>
+        <h2 class="text-2xl font-extrabold text-slate-900">Active Roles</h2>
+        <p class="text-slate-500 text-sm mt-1">Select a role to screen candidates or review past results.</p>
+      </div>
+      <button class="btn bg-violet-600 hover:bg-violet-700 text-white border-0 shadow-md gap-2 font-semibold" onclick="showCreate()">
+        <span class="text-lg">+</span> New Job Profile
+      </button>
+    </div>
+    <div id="jobs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+  </div>
+
+  <!-- ── CREATE / EDIT ──────────────────────────────────── -->
+  <div id="create-view" class="view">
+    <div class="flex items-center gap-4 mb-7 flex-wrap">
+      <button class="btn btn-ghost btn-sm gap-1 text-slate-500 hover:text-slate-800" onclick="goBackFromCreate()">← Back</button>
+      <h2 class="text-xl font-bold" id="create-view-title">New Job Profile</h2>
+    </div>
+    <div class="card bg-white shadow-sm border border-slate-200">
+      <div class="card-body gap-5">
+        <div>
+          <label class="label pb-1"><span class="label-text font-semibold text-slate-700">Role Title</span></label>
+          <input type="text" id="profile-name" class="input input-bordered w-full focus:border-violet-500 focus:ring-2 focus:ring-violet-100" placeholder="e.g. Senior Software Engineer, Marketing Manager" />
+        </div>
+        <div>
+          <label class="label pb-1"><span class="label-text font-semibold text-slate-700">Job Description</span></label>
+          <textarea id="profile-jd" class="textarea textarea-bordered w-full h-72 focus:border-violet-500 focus:ring-2 focus:ring-violet-100 leading-relaxed" placeholder="Paste the full job description here. Saved and reused every time you screen a candidate for this role."></textarea>
+        </div>
+        <div class="flex gap-3 pt-1">
+          <button class="btn bg-violet-600 hover:bg-violet-700 text-white border-0 font-semibold" onclick="saveProfile()">Save Profile</button>
+          <button class="btn btn-ghost text-slate-500" onclick="goBackFromCreate()">Cancel</button>
+        </div>
+        <div class="alert alert-error text-sm hidden" id="create-error"></div>
       </div>
     </div>
-    <div class="detail-stats" id="job-detail-stats"></div>
-    <div class="candidates-section-header">
-      <h3 id="candidates-section-title">Candidates</h3>
-      <button class="btn-primary" onclick="showScreen(currentProfileId)">+ Screen New Candidate</button>
+  </div>
+
+  <!-- ── JOB DETAIL ─────────────────────────────────────── -->
+  <div id="job-detail-view" class="view">
+    <div class="flex items-center gap-3 mb-6 flex-wrap">
+      <button class="btn btn-ghost btn-sm gap-1 text-slate-500 hover:text-slate-800" onclick="showHome()">← All Jobs</button>
+      <h2 class="text-xl font-bold" id="job-detail-title"></h2>
+      <button class="btn btn-ghost btn-sm ml-auto text-slate-500" onclick="showCreate(currentProfileId)">✏️ Edit</button>
     </div>
-    <div class="filter-bar" id="candidate-filter-bar" style="display:none;">
+
+    <div class="card bg-white border border-slate-200 shadow-sm mb-5">
+      <div class="card-body py-4">
+        <div class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Job Description</div>
+        <p class="text-sm text-slate-600 leading-relaxed" id="job-detail-jd-preview"></p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6" id="job-detail-stats"></div>
+
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-3">
+      <h3 class="text-base font-bold" id="candidates-section-title">Candidates</h3>
+      <button class="btn bg-violet-600 hover:bg-violet-700 text-white border-0 btn-sm font-semibold shadow" onclick="showScreen(currentProfileId)">+ Screen New Candidate</button>
+    </div>
+
+    <div class="filter-bar items-center gap-2 flex-wrap mb-4" id="candidate-filter-bar" style="display:none">
       <button class="filter-chip active" data-filter="all"      onclick="setFilter('all')">All</button>
       <button class="filter-chip"        data-filter="passed"   onclick="setFilter('passed')">✓ Passed</button>
       <button class="filter-chip"        data-filter="failed"   onclick="setFilter('failed')">✗ Below</button>
       <button class="filter-chip"        data-filter="pending"  onclick="setFilter('pending')">Pending</button>
       <button class="filter-chip"        data-filter="advanced" onclick="setFilter('advanced')">Advanced</button>
       <button class="filter-chip"        data-filter="denied"   onclick="setFilter('denied')">Denied</button>
-      <select class="sort-select" id="sort-select" onchange="rerenderCandidates()">
+      <select class="ml-auto select select-bordered select-sm text-xs font-semibold bg-white" id="sort-select" onchange="rerenderCandidates()">
         <option value="score-desc">Score: High → Low</option>
         <option value="score-asc">Score: Low → High</option>
         <option value="date-desc">Newest First</option>
@@ -354,174 +177,227 @@
     <div id="candidates-list-view"></div>
   </div>
 
-  <!-- SCREEN -->
+  <!-- ── SCREEN ─────────────────────────────────────────── -->
   <div id="screen-view" class="view">
-    <div class="view-header">
-      <button class="btn-secondary" onclick="showJobDetail(currentProfileId)">← Back</button>
-      <h2 id="screen-view-title">Screen Candidates</h2>
+    <div class="flex items-center gap-3 mb-6 flex-wrap">
+      <button class="btn btn-ghost btn-sm gap-1 text-slate-500 hover:text-slate-800" onclick="showJobDetail(currentProfileId)">← Back</button>
+      <h2 class="text-xl font-bold" id="screen-view-title">Screen Candidates</h2>
     </div>
-    <div class="screen-job-banner">
-      <div><span id="screen-job-name"></span><br/><small>Job description loaded from saved profile</small></div>
-      <button class="btn-ghost" onclick="showCreate(currentProfileId)">✏️ Edit Profile</button>
+
+    <div class="bg-violet-50 border border-violet-200 rounded-xl px-5 py-3 mb-4 flex items-center justify-between gap-3">
+      <div>
+        <span class="text-sm font-bold text-violet-800" id="screen-job-name"></span>
+        <div class="text-xs text-violet-500 mt-0.5">Job description loaded from saved profile</div>
+      </div>
+      <button class="btn btn-ghost btn-sm text-violet-600 hover:bg-violet-100" onclick="showCreate(currentProfileId)">✏️ Edit Profile</button>
     </div>
-    <div class="strictness-bar">
-      <label>Screening Strictness:</label>
-      <div class="strictness-options">
+
+    <div class="bg-white border border-slate-200 rounded-xl px-5 py-3 mb-4 flex items-center gap-4 flex-wrap shadow-sm">
+      <span class="text-sm font-semibold text-slate-700">Screening Strictness:</span>
+      <div class="flex gap-2">
         <button class="strictness-btn" id="s-1" onclick="setStrictness(1)">Lenient</button>
         <button class="strictness-btn" id="s-2" onclick="setStrictness(2)">Balanced</button>
         <button class="strictness-btn" id="s-3" onclick="setStrictness(3)">Strict</button>
       </div>
-      <span class="strictness-desc" id="strictness-desc"></span>
+      <span class="text-xs text-slate-400" id="strictness-desc"></span>
     </div>
+
     <!-- Batch upload zone -->
     <input type="file" id="batch-fileinput" multiple accept=".pdf,.docx,.txt" style="display:none" onchange="handleBatchFileSelect(event)" />
-    <div class="batch-upload-zone" id="batch-upload-zone"
+    <div class="batch-upload-zone border-2 border-dashed border-violet-300 rounded-2xl bg-violet-50/60 p-8 text-center cursor-pointer transition-all mb-5 hover:border-violet-500 hover:bg-violet-50"
+         id="batch-upload-zone"
          ondragover="handleBatchDragOver(event)"
          ondragleave="handleBatchDragLeave(event)"
          ondrop="handleBatchDrop(event)"
          onclick="document.getElementById('batch-fileinput').click()">
-      <div class="bz-icon">📂</div>
-      <div class="bz-title">Batch Upload Resumes</div>
-      <div class="bz-sub">Drop multiple files at once — each becomes a candidate · PDF, DOCX, TXT</div>
-      <button type="button" class="bz-btn" onclick="event.stopPropagation();document.getElementById('batch-fileinput').click()">Browse Multiple Files</button>
+      <div class="text-4xl mb-3">📂</div>
+      <div class="text-base font-bold text-violet-800 mb-1">Batch Upload Resumes</div>
+      <div class="text-sm text-violet-500 mb-4">Drop multiple files at once — each becomes a candidate · PDF, DOCX, TXT</div>
+      <button type="button" class="btn bg-violet-600 hover:bg-violet-700 text-white border-0 btn-sm font-semibold shadow"
+              onclick="event.stopPropagation();document.getElementById('batch-fileinput').click()">Browse Multiple Files</button>
     </div>
 
     <!-- Parse progress -->
-    <div class="batch-parse-progress" id="batch-parse-progress">
-      <div class="bp-label" id="bp-label">Parsing files...</div>
-      <div class="batch-progress-bar-wrap"><div class="batch-progress-bar" id="batch-progress-bar" style="width:0%"></div></div>
+    <div class="bg-violet-50 border border-violet-200 rounded-xl p-4 mb-4 hidden" id="batch-parse-progress">
+      <div class="text-sm font-semibold text-violet-800 mb-2" id="bp-label">Parsing files...</div>
+      <div class="w-full bg-violet-100 rounded-full h-1.5 overflow-hidden">
+        <div class="bg-violet-600 h-1.5 rounded-full transition-all duration-300" id="batch-progress-bar" style="width:0%"></div>
+      </div>
     </div>
 
-    <div class="batch-section-header">
-      <span>Candidates to Screen <span id="candidate-count-label" style="font-weight:400;color:#9ca3af;"></span></span>
-      <button class="clear-all-btn" onclick="clearAllCandidates()">Clear all</button>
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-sm font-semibold text-slate-700">
+        Candidates to Screen <span id="candidate-count-label" class="font-normal text-slate-400"></span>
+      </span>
+      <button class="text-xs text-slate-400 hover:text-red-500 underline cursor-pointer bg-transparent border-0" onclick="clearAllCandidates()">Clear all</button>
     </div>
+
     <div id="candidates-input-list"></div>
-    <button class="add-candidate-btn" onclick="addCandidateInput()">+ Add Individual Candidate</button>
-    <div class="screen-actions">
-      <button class="btn-primary" style="padding:13px 40px;font-size:1rem;" onclick="runScreening()">
+    <button class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl bg-transparent cursor-pointer text-sm text-slate-400 hover:border-violet-400 hover:text-violet-500 hover:bg-violet-50/50 transition-all mb-6 font-medium"
+            onclick="addCandidateInput()">+ Add Individual Candidate</button>
+
+    <div class="flex items-center justify-center gap-4">
+      <button class="btn bg-violet-600 hover:bg-violet-700 text-white border-0 px-10 py-3 text-base font-bold shadow-lg" onclick="runScreening()">
         <span id="screen-btn-label">Screen Candidate</span>
       </button>
     </div>
-    <div class="error-box" id="screen-error"></div>
+    <div class="alert alert-error text-sm mt-4 hidden" id="screen-error"></div>
   </div>
 
-  <!-- LOADING -->
-  <div id="loading-view" class="view">
-    <div class="spinner"></div>
-    <p>Analyzing candidate against job requirements...</p>
-    <p class="loading-progress" id="loading-progress"></p>
+  <!-- ── LOADING ────────────────────────────────────────── -->
+  <div id="loading-view" class="view text-center py-24 text-slate-500">
+    <div class="w-12 h-12 border-4 border-slate-200 border-t-violet-600 rounded-full spinner mx-auto mb-5"></div>
+    <p class="text-base font-semibold text-slate-700">Analyzing candidate against job requirements...</p>
+    <p class="text-sm text-slate-400 mt-2" id="loading-progress"></p>
   </div>
 
-  <!-- CANDIDATE PROFILE -->
+  <!-- ── CANDIDATE PROFILE ──────────────────────────────── -->
   <div id="candidate-view" class="view">
-    <div class="view-header">
-      <button class="btn-secondary" id="candidate-back-btn" onclick="showJobDetail(currentProfileId)">← Back to Job</button>
-      <button class="btn-secondary" style="margin-left:auto;" onclick="exportCandidateCSV()">⬇ Export CSV</button>
+    <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+      <button class="btn btn-ghost btn-sm gap-1 text-slate-500 hover:text-slate-800" id="candidate-back-btn" onclick="showJobDetail(currentProfileId)">← Back to Job</button>
+      <button class="btn btn-outline btn-sm text-slate-500 gap-1" onclick="exportCandidateCSV()">⬇ Export CSV</button>
     </div>
 
-    <div class="score-hero">
-      <div class="score-big-circle" id="score-big-circle">
-        <span class="big-num" id="score-big-num"></span>
-        <span class="big-lbl">/ 100</span>
-      </div>
-      <div class="score-hero-info">
-        <h2 id="candidate-profile-name"></h2>
-        <div class="score-hero-badges">
-          <span class="threshold-big" id="threshold-big-badge"></span>
-          <span class="ai-badge" id="ai-rec-badge"></span>
-          <span class="status-badge" id="candidate-status-badge"></span>
+    <!-- Score hero -->
+    <div class="card bg-white border border-slate-200 shadow-sm mb-5">
+      <div class="card-body flex-row items-center gap-6 flex-wrap">
+        <div class="flex-shrink-0">
+          <div class="w-24 h-24 rounded-full flex flex-col items-center justify-center border-4" id="score-big-circle">
+            <span class="text-3xl font-black leading-none" id="score-big-num"></span>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide mt-0.5">/ 100</span>
+          </div>
         </div>
-        <p class="score-hero-reason" id="candidate-decision-reason"></p>
-        <div style="font-size:0.75rem;color:#9ca3af;margin-top:6px;" id="candidate-screened-at"></div>
-      </div>
-      <div class="decision-actions">
-        <label>Your Decision</label>
-        <div class="decision-btns">
-          <button class="decision-btn advance-btn" id="btn-advance" onclick="setDecision('advanced')">✓ Advance</button>
-          <button class="decision-btn deny-btn"    id="btn-deny"    onclick="setDecision('denied')">✗ Deny</button>
+        <div class="flex-1 min-w-0">
+          <h2 class="text-2xl font-extrabold mb-2" id="candidate-profile-name"></h2>
+          <div class="flex flex-wrap gap-2 mb-2" id="score-hero-badges">
+            <span class="text-sm font-bold px-3 py-1 rounded-full" id="threshold-big-badge"></span>
+            <span class="text-xs font-bold px-3 py-1 rounded-full" id="ai-rec-badge"></span>
+            <span class="text-xs font-semibold px-3 py-1 rounded-full" id="candidate-status-badge"></span>
+          </div>
+          <p class="text-sm text-slate-500 leading-relaxed" id="candidate-decision-reason"></p>
+          <div class="text-xs text-slate-400 mt-1.5" id="candidate-screened-at"></div>
         </div>
-        <button class="decision-btn pending-btn" id="btn-pending" onclick="setDecision('pending')" style="width:100%;">Reset to Pending</button>
+        <div class="flex flex-col items-center gap-2 flex-shrink-0">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Your Decision</span>
+          <div class="flex gap-2">
+            <button class="decision-btn advance-btn" id="btn-advance" onclick="setDecision('advanced')">✓ Advance</button>
+            <button class="decision-btn deny-btn"    id="btn-deny"    onclick="setDecision('denied')">✗ Deny</button>
+          </div>
+          <button class="decision-btn pending-btn w-full text-center" id="btn-pending" onclick="setDecision('pending')">Reset to Pending</button>
+        </div>
       </div>
     </div>
 
-    <div class="candidate-profile-grid">
-      <div class="card">
-        <h3>Category Scores</h3>
-        <div id="candidate-scores-container"></div>
+    <!-- Scores + Pros/Cons -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div class="card bg-white border border-slate-200 shadow-sm">
+        <div class="card-body">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Category Scores</h3>
+          <div id="candidate-scores-container"></div>
+        </div>
       </div>
-      <div class="card">
-        <h3>Pros &amp; Cons</h3>
-        <ul class="pros-cons" id="candidate-pros"></ul>
-        <div style="height:1px;background:#f3f4f6;margin:10px 0;"></div>
-        <ul class="pros-cons" id="candidate-cons"></ul>
+      <div class="card bg-white border border-slate-200 shadow-sm">
+        <div class="card-body">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Strengths</h3>
+          <ul id="candidate-pros" class="space-y-1 mb-4"></ul>
+          <div class="h-px bg-slate-100 my-3"></div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Gaps</h3>
+          <ul id="candidate-cons" class="space-y-1"></ul>
+        </div>
       </div>
     </div>
 
-    <div class="summary-card">
-      <h3>Comprehensive Summary</h3>
-      <p id="candidate-summary"></p>
-      <button class="copy-btn" onclick="copyCandidateSummary()">Copy to Clipboard</button>
+    <!-- Summary -->
+    <div class="card bg-white border border-slate-200 shadow-sm mb-4">
+      <div class="card-body">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Comprehensive Summary</h3>
+        <p class="text-sm text-slate-700 leading-relaxed" id="candidate-summary"></p>
+        <button class="btn btn-ghost btn-sm mt-3 text-slate-500 border border-slate-200 text-xs" onclick="copyCandidateSummary()">Copy to Clipboard</button>
+      </div>
     </div>
 
     <!-- Notes -->
-    <div class="card" style="margin-bottom:16px;">
-      <div class="gen-section-header">
-        <h3>Recruiter Notes</h3>
-        <span class="notes-saved" id="notes-saved-indicator">Saved ✓</span>
+    <div class="card bg-white border border-slate-200 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">Recruiter Notes</h3>
+          <span class="text-xs text-emerald-500 font-semibold hidden" id="notes-saved-indicator">Saved ✓</span>
+        </div>
+        <textarea class="textarea textarea-bordered w-full min-h-20 focus:border-violet-400 leading-relaxed text-sm" id="candidate-notes" placeholder="Add your own observations, flags, or reminders about this candidate..." oninput="autoSaveNotes()"></textarea>
       </div>
-      <textarea class="notes-textarea" id="candidate-notes" placeholder="Add your own observations, flags, or reminders about this candidate..." oninput="autoSaveNotes()"></textarea>
     </div>
 
     <!-- Interview Questions -->
-    <div class="card" style="margin-bottom:16px;">
-      <div class="gen-section-header">
-        <h3>Interview Questions</h3>
-        <button class="gen-btn" id="gen-questions-btn" onclick="generateQuestions()">Generate Questions</button>
+    <div class="card bg-white border border-slate-200 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">Interview Questions</h3>
+          <button class="btn bg-violet-50 hover:bg-violet-600 text-violet-700 hover:text-white border border-violet-200 hover:border-violet-600 btn-sm text-xs font-semibold transition-all" id="gen-questions-btn" onclick="generateQuestions()">Generate Questions</button>
+        </div>
+        <div id="questions-container" style="display:none;"></div>
       </div>
-      <div id="questions-container" style="display:none;"></div>
     </div>
 
     <!-- Email Draft -->
-    <div class="card" style="margin-bottom:16px;" id="email-card">
-      <div class="gen-section-header">
-        <h3>Email Draft</h3>
-        <button class="gen-btn" id="gen-email-btn" onclick="generateEmail()">Generate Email</button>
+    <div class="card bg-white border border-slate-200 shadow-sm mb-4" id="email-card">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">Email Draft</h3>
+          <button class="btn bg-violet-50 hover:bg-violet-600 text-violet-700 hover:text-white border border-violet-200 hover:border-violet-600 btn-sm text-xs font-semibold transition-all" id="gen-email-btn" onclick="generateEmail()">Generate Email</button>
+        </div>
+        <div id="email-container" style="display:none;"></div>
       </div>
-      <div id="email-container" style="display:none;"></div>
     </div>
 
     <!-- Resume -->
-    <div class="card">
-      <h3>Resume</h3>
-      <button class="resume-toggle" onclick="toggleResume()">Show Resume Text</button>
-      <div class="resume-text" id="resume-text-display"></div>
-    </div>
-  </div>
-
-  <!-- BATCH RESULTS -->
-  <div id="batch-results-view" class="view">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <button class="btn-secondary" onclick="showScreen(currentProfileId)">← Screen More</button>
-        <button class="btn-secondary" onclick="showJobDetail(currentProfileId)">View Job Profile</button>
+    <div class="card bg-white border border-slate-200 shadow-sm">
+      <div class="card-body">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Resume</h3>
+        <button class="resume-toggle btn btn-ghost btn-sm text-slate-500 border border-slate-200 text-xs mb-3" onclick="toggleResume()">Show Resume Text</button>
+        <div class="resume-text text-xs text-slate-500 leading-relaxed bg-slate-50 border border-slate-100 rounded-lg p-4 max-h-72 overflow-y-auto whitespace-pre-wrap hidden" id="resume-text-display"></div>
       </div>
-      <button class="btn-primary" onclick="exportBatchCSV()">⬇ Export to CSV</button>
-    </div>
-    <div class="batch-summary-bar" id="batch-summary"></div>
-    <div class="card">
-      <h3>Ranked Candidates — click any row to view full profile</h3>
-      <table class="rank-table">
-        <thead><tr>
-          <th>#</th><th>Candidate</th><th>Score</th><th>Threshold</th>
-          <th>AI Rec</th><th>Skills</th><th>Experience</th><th>Education</th>
-        </tr></thead>
-        <tbody id="rank-tbody"></tbody>
-      </table>
     </div>
   </div>
 
-</div>
+  <!-- ── BATCH RESULTS ──────────────────────────────────── -->
+  <div id="batch-results-view" class="view">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div class="flex gap-3 flex-wrap">
+        <button class="btn btn-ghost btn-sm text-slate-500" onclick="showScreen(currentProfileId)">← Screen More</button>
+        <button class="btn btn-ghost btn-sm text-slate-500" onclick="showJobDetail(currentProfileId)">View Job Profile</button>
+      </div>
+      <button class="btn bg-violet-600 hover:bg-violet-700 text-white border-0 btn-sm font-semibold shadow" onclick="exportBatchCSV()">⬇ Export to CSV</button>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6" id="batch-summary"></div>
+
+    <div class="card bg-white border border-slate-200 shadow-sm overflow-hidden">
+      <div class="card-body p-0">
+        <div class="px-5 py-4 border-b border-slate-100">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">Ranked Candidates — click any row to view full profile</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table table-sm w-full">
+            <thead>
+              <tr class="text-xs text-slate-400 uppercase tracking-wider bg-slate-50/80">
+                <th class="font-bold">#</th>
+                <th class="font-bold">Candidate</th>
+                <th class="font-bold">Score</th>
+                <th class="font-bold">Threshold</th>
+                <th class="font-bold">AI Rec</th>
+                <th class="font-bold">Skills</th>
+                <th class="font-bold">Experience</th>
+                <th class="font-bold">Education</th>
+              </tr>
+            </thead>
+            <tbody id="rank-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
 
 <script>
   // ── STATE ──────────────────────────────────────────────
@@ -542,7 +418,6 @@
   // ── STORAGE ───────────────────────────────────────────
   function getProfiles() { return JSON.parse(localStorage.getItem('jobProfiles') || '[]'); }
   function saveProfiles(p) { localStorage.setItem('jobProfiles', JSON.stringify(p)); }
-
   function getProfile(id) { return getProfiles().find(p => p.id === id); }
 
   function saveCandidate(profileId, candidateData) {
@@ -587,7 +462,8 @@
 
   function showCreate(profileId = null) {
     editingProfileId = profileId;
-    document.getElementById('create-error').style.display = 'none';
+    const errEl = document.getElementById('create-error');
+    errEl.classList.add('hidden');
     if (profileId) {
       const p = getProfile(profileId);
       document.getElementById('create-view-title').textContent = 'Edit Job Profile';
@@ -613,18 +489,30 @@
 
     document.getElementById('job-detail-title').textContent = p.name;
     document.getElementById('job-detail-jd-preview').textContent =
-      p.jobDescription.length > 200 ? p.jobDescription.substring(0, 200) + '…' : p.jobDescription;
+      p.jobDescription.length > 220 ? p.jobDescription.substring(0, 220) + '…' : p.jobDescription;
 
     const candidates = p.candidates || [];
-    const passed = candidates.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
+    const passed   = candidates.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
     const advanced = candidates.filter(c => c.status === 'advanced').length;
-    const denied = candidates.filter(c => c.status === 'denied').length;
+    const denied   = candidates.filter(c => c.status === 'denied').length;
 
     document.getElementById('job-detail-stats').innerHTML = `
-      <div class="detail-stat"><div class="num">${candidates.length}</div><div class="lbl">Screened</div></div>
-      <div class="detail-stat"><div class="num" style="color:#1e40af">${passed}</div><div class="lbl">Passed (≥${THRESHOLD})</div></div>
-      <div class="detail-stat"><div class="num" style="color:#065f46">${advanced}</div><div class="lbl">Advanced</div></div>
-      <div class="detail-stat"><div class="num" style="color:#991b1b">${denied}</div><div class="lbl">Denied</div></div>`;
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+        <div class="text-2xl font-extrabold text-slate-800">${candidates.length}</div>
+        <div class="text-xs text-slate-400 mt-1 font-medium">Screened</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+        <div class="text-2xl font-extrabold text-indigo-600">${passed}</div>
+        <div class="text-xs text-slate-400 mt-1 font-medium">Passed (≥${THRESHOLD})</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+        <div class="text-2xl font-extrabold text-emerald-600">${advanced}</div>
+        <div class="text-xs text-slate-400 mt-1 font-medium">Advanced</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+        <div class="text-2xl font-extrabold text-rose-500">${denied}</div>
+        <div class="text-xs text-slate-400 mt-1 font-medium">Denied</div>
+      </div>`;
 
     document.getElementById('candidates-section-title').textContent =
       candidates.length ? `${candidates.length} Candidate${candidates.length !== 1 ? 's' : ''}` : 'No candidates yet';
@@ -639,8 +527,7 @@
 
     if (!candidates.length) {
       document.getElementById('candidates-list-view').innerHTML =
-        `<div style="text-align:center;padding:40px;color:#9ca3af;font-size:0.9rem;">
-          No candidates screened yet. Click "Screen New Candidate" to get started.</div>`;
+        `<div class="text-center py-12 text-slate-400 text-sm">No candidates screened yet. Click "Screen New Candidate" to get started.</div>`;
     } else {
       rerenderCandidates();
     }
@@ -653,7 +540,7 @@
     const p = getProfile(profileId);
     document.getElementById('screen-view-title').textContent = `Screen — ${p.name}`;
     document.getElementById('screen-job-name').textContent = p.name;
-    document.getElementById('screen-error').style.display = 'none';
+    document.getElementById('screen-error').classList.add('hidden');
     setStrictness(2);
     resetCandidateInputs();
     showView('screen-view');
@@ -669,48 +556,71 @@
     const color = scoreColor(score);
 
     const circle = document.getElementById('score-big-circle');
-    circle.style.background = `${color}18`;
+    circle.style.background = `${color}15`;
     circle.style.color = color;
-    circle.style.border = `3px solid ${color}`;
+    circle.style.borderColor = color;
     document.getElementById('score-big-num').textContent = score;
 
     document.getElementById('candidate-profile-name').textContent = c.name || 'Unnamed Candidate';
-    document.getElementById('threshold-big-badge').textContent = passes ? `✓ Passes Threshold (${THRESHOLD}+)` : `✗ Below Threshold (${THRESHOLD})`;
-    document.getElementById('threshold-big-badge').className = `threshold-big ${passes ? 'pass' : 'fail'}`;
-    document.getElementById('ai-rec-badge').textContent = `AI: ${c.decision}`;
-    document.getElementById('ai-rec-badge').className = `ai-badge ${c.decision === 'ADVANCE' ? 'advance' : 'reject'}`;
+
+    const threshEl = document.getElementById('threshold-big-badge');
+    threshEl.textContent = passes ? `✓ Passes Threshold (${THRESHOLD}+)` : `✗ Below Threshold (${THRESHOLD})`;
+    threshEl.className = passes
+      ? 'text-sm font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700'
+      : 'text-sm font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-700';
+
+    const aiEl = document.getElementById('ai-rec-badge');
+    aiEl.textContent = `AI: ${c.decision}`;
+    aiEl.className = c.decision === 'ADVANCE'
+      ? 'text-xs font-bold px-3 py-1 rounded-full bg-violet-100 text-violet-700'
+      : 'text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700';
+
     document.getElementById('candidate-decision-reason').textContent = c.decision_reason || '';
-    document.getElementById('candidate-screened-at').textContent = `Screened ${c.screenedAt} · ${c.confidence} confidence · ${c.screening_time_seconds}s`;
+    document.getElementById('candidate-screened-at').textContent =
+      `Screened ${c.screenedAt} · ${c.confidence} confidence · ${c.screening_time_seconds}s`;
 
     updateDecisionUI(c.status);
 
-    const scoreLabels = { skills_match: 'Skills Match', experience_level: 'Experience', education_fit: 'Education Fit', overall_fit: 'Overall Fit' };
+    const scoreLabels = {
+      skills_match: 'Skills Match',
+      experience_level: 'Experience',
+      education_fit: 'Education Fit',
+      overall_fit: 'Overall Fit',
+    };
     const sc = document.getElementById('candidate-scores-container');
     sc.innerHTML = '';
     for (const [key, label] of Object.entries(scoreLabels)) {
       const val = c.scores?.[key] ?? 0;
       const col = scoreColor(val);
-      sc.innerHTML += `<div class="score-row">
-        <span class="score-label">${label}</span>
-        <div class="score-bar-wrap"><div class="score-bar" style="width:${val}%;background:${col};"></div></div>
-        <span class="score-num" style="color:${col}">${val}</span></div>`;
+      sc.innerHTML += `
+        <div class="flex items-center mb-3">
+          <span class="text-sm text-slate-600 w-32 shrink-0">${label}</span>
+          <div class="flex-1 h-2 bg-slate-100 rounded-full mx-3 overflow-hidden">
+            <div class="score-bar" style="width:${val}%;background:${col};"></div>
+          </div>
+          <span class="text-sm font-bold w-8 text-right" style="color:${col}">${val}</span>
+        </div>`;
     }
 
     document.getElementById('candidate-pros').innerHTML =
-      (c.strengths || []).map(s => `<li><span class="dot pro-dot"></span>${esc(s)}</li>`).join('');
+      (c.strengths || []).map(s => `
+        <li class="flex items-start gap-2 text-sm text-slate-700 py-1 border-b border-slate-50 last:border-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0"></span>${esc(s)}
+        </li>`).join('');
     document.getElementById('candidate-cons').innerHTML =
-      (c.gaps || []).map(g => `<li><span class="dot con-dot"></span>${esc(g)}</li>`).join('');
+      (c.gaps || []).map(g => `
+        <li class="flex items-start gap-2 text-sm text-slate-700 py-1 border-b border-slate-50 last:border-0">
+          <span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 shrink-0"></span>${esc(g)}
+        </li>`).join('');
 
     document.getElementById('candidate-summary').textContent = c.summary || '';
     document.getElementById('resume-text-display').textContent = c.resume || '';
-    document.getElementById('resume-text-display').style.display = 'none';
+    document.getElementById('resume-text-display').classList.add('hidden');
     document.querySelector('.resume-toggle').textContent = 'Show Resume Text';
 
-    // Notes
     document.getElementById('candidate-notes').value = c.notes || '';
-    document.getElementById('notes-saved-indicator').style.display = 'none';
+    document.getElementById('notes-saved-indicator').classList.add('hidden');
 
-    // Reset generated sections
     document.getElementById('questions-container').style.display = 'none';
     document.getElementById('questions-container').innerHTML = '';
     document.getElementById('gen-questions-btn').textContent = 'Generate Questions';
@@ -761,24 +671,28 @@
   function renderCandidateRows(candidates) {
     const listEl = document.getElementById('candidates-list-view');
     if (!candidates.length) {
-      listEl.innerHTML = `<div style="text-align:center;padding:30px;color:#9ca3af;font-size:0.88rem;">No candidates match this filter.</div>`;
+      listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">No candidates match this filter.</div>`;
       return;
     }
     listEl.innerHTML = candidates.map(c => {
       const score = c.resume_score || 0;
       const passes = score >= THRESHOLD;
       const color = scoreColor(score);
-      return `<div class="candidate-row" onclick="showCandidateProfile('${c.id}')">
-        <div class="score-circle" style="background:${color}18;color:${color};">${score}</div>
-        <div class="candidate-row-info">
-          <div class="cname">${esc(c.name || 'Unnamed Candidate')}</div>
-          <div class="cdate">${c.screenedAt}</div>
-        </div>
-        <span class="threshold-badge ${passes ? 'pass' : 'fail'}">${passes ? '✓ Passes' : '✗ Below'} ${THRESHOLD}</span>
-        <span class="ai-badge ${c.decision === 'ADVANCE' ? 'advance' : 'reject'}">AI: ${c.decision}</span>
-        <span class="status-badge ${c.status}">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
-        <span style="color:#9ca3af;font-size:1.1rem;margin-left:auto;">›</span>
-      </div>`;
+      const statusColors = { pending: 'bg-slate-100 text-slate-500', advanced: 'bg-emerald-100 text-emerald-700', denied: 'bg-rose-100 text-rose-700' };
+      return `
+        <div class="bg-white border border-slate-200 rounded-xl px-4 py-3.5 mb-2.5 flex items-center gap-4 cursor-pointer hover:border-violet-300 hover:shadow-md transition-all flex-wrap group"
+             onclick="showCandidateProfile('${c.id}')">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center text-base font-black shrink-0 border-2"
+               style="background:${color}12;color:${color};border-color:${color}40;">${score}</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-slate-900 text-sm">${esc(c.name || 'Unnamed Candidate')}</div>
+            <div class="text-xs text-slate-400 mt-0.5">${c.screenedAt}</div>
+          </div>
+          <span class="text-xs font-bold px-2.5 py-1 rounded-full ${passes ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">${passes ? '✓ Passes' : '✗ Below'} ${THRESHOLD}</span>
+          <span class="text-xs font-bold px-2.5 py-1 rounded-full ${c.decision === 'ADVANCE' ? 'bg-violet-50 text-violet-700 border border-violet-200' : 'bg-amber-50 text-amber-600 border border-amber-200'}">AI: ${c.decision}</span>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${statusColors[c.status] || statusColors.pending}">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
+          <span class="text-slate-300 group-hover:text-violet-400 text-xl ml-1 transition-colors">›</span>
+        </div>`;
     }).join('');
   }
 
@@ -789,11 +703,16 @@
   }
 
   function updateDecisionUI(status) {
-    document.getElementById('candidate-status-badge').textContent = status.charAt(0).toUpperCase() + status.slice(1);
-    document.getElementById('candidate-status-badge').className = `status-badge ${status}`;
-    ['advance', 'deny', 'pending'].forEach(t => {
-      document.getElementById(`btn-${t}`).classList.remove('selected');
-    });
+    const statusColors = {
+      pending:  'bg-slate-100 text-slate-500',
+      advanced: 'bg-emerald-100 text-emerald-700',
+      denied:   'bg-rose-100 text-rose-700',
+    };
+    const badge = document.getElementById('candidate-status-badge');
+    badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    badge.className = `text-xs font-semibold px-3 py-1 rounded-full ${statusColors[status] || statusColors.pending}`;
+
+    ['advance', 'deny', 'pending'].forEach(t => document.getElementById(`btn-${t}`).classList.remove('selected'));
     if (status === 'advanced') document.getElementById('btn-advance').classList.add('selected');
     if (status === 'denied')   document.getElementById('btn-deny').classList.add('selected');
     if (status === 'pending')  document.getElementById('btn-pending').classList.add('selected');
@@ -803,10 +722,10 @@
   function saveProfile() {
     const name = document.getElementById('profile-name').value.trim();
     const jd = document.getElementById('profile-jd').value.trim();
-    const errBox = document.getElementById('create-error');
+    const errEl = document.getElementById('create-error');
     if (!name || !jd) {
-      errBox.textContent = 'Please fill in both the role title and job description.';
-      errBox.style.display = 'block';
+      errEl.textContent = 'Please fill in both the role title and job description.';
+      errEl.classList.remove('hidden');
       return;
     }
     const profiles = getProfiles();
@@ -836,35 +755,42 @@
     const profiles = getProfiles();
     const grid = document.getElementById('jobs-grid');
     if (!profiles.length) {
-      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div>
-        <h3>No job profiles yet</h3><p>Create your first profile to start screening.</p>
-        <button class="btn-primary" onclick="showCreate()">+ Create First Profile</button></div>`;
+      grid.innerHTML = `
+        <div class="col-span-full text-center py-20 text-slate-400">
+          <div class="text-5xl mb-4">📋</div>
+          <div class="text-lg font-bold text-slate-500 mb-2">No job profiles yet</div>
+          <p class="text-sm mb-6">Create your first profile to start screening candidates.</p>
+          <button class="btn bg-violet-600 hover:bg-violet-700 text-white border-0 shadow font-semibold" onclick="showCreate()">+ Create First Profile</button>
+        </div>`;
       return;
     }
     grid.innerHTML = profiles.map(p => {
       const candidates = p.candidates || [];
-      const passed = candidates.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
+      const passed   = candidates.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
       const advanced = candidates.filter(c => c.status === 'advanced').length;
-      return `<div class="job-card" onclick="showJobDetail('${p.id}')">
-        <div class="job-card-top">
-          <div class="job-card-icon">💼</div>
-          <div class="job-card-actions">
-            <button class="btn-ghost" title="Edit" onclick="showCreate('${p.id}');event.stopPropagation()">✏️</button>
-            <button class="btn-ghost danger" title="Delete" onclick="deleteProfile('${p.id}',event)">🗑️</button>
+      return `
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 cursor-pointer hover:border-violet-400 hover:shadow-xl transition-all group"
+             onclick="showJobDetail('${p.id}')">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center text-xl">💼</div>
+            <div class="flex gap-1">
+              <button class="btn btn-ghost btn-xs text-slate-400 hover:text-slate-700" title="Edit" onclick="showCreate('${p.id}');event.stopPropagation()">✏️</button>
+              <button class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500" title="Delete" onclick="deleteProfile('${p.id}',event)">🗑️</button>
+            </div>
           </div>
-        </div>
-        <h3>${esc(p.name)}</h3>
-        <p>${esc(p.jobDescription.substring(0, 90))}...</p>
-        <div class="job-card-stats">
-          <span class="stat-chip gray">${candidates.length} screened</span>
-          ${passed  ? `<span class="stat-chip green">${passed} passed</span>` : ''}
-          ${advanced ? `<span class="stat-chip green">${advanced} advanced</span>` : ''}
-        </div>
-        <div class="job-card-footer">
-          <span class="job-card-date">${p.createdAt}</span>
-          <button class="screen-from-card-btn" onclick="showScreen('${p.id}');event.stopPropagation()">Screen →</button>
-        </div>
-      </div>`;
+          <h3 class="font-bold text-slate-900 text-base mb-1 group-hover:text-violet-700 transition-colors">${esc(p.name)}</h3>
+          <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-3">${esc(p.jobDescription.substring(0, 100))}...</p>
+          <div class="flex gap-2 flex-wrap mb-3">
+            <span class="text-xs font-semibold bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">${candidates.length} screened</span>
+            ${passed   ? `<span class="text-xs font-semibold bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full border border-emerald-100">${passed} passed</span>` : ''}
+            ${advanced ? `<span class="text-xs font-semibold bg-violet-50 text-violet-600 px-2.5 py-1 rounded-full border border-violet-100">${advanced} advanced</span>` : ''}
+          </div>
+          <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+            <span class="text-xs text-slate-400">${p.createdAt}</span>
+            <button class="btn btn-ghost btn-xs text-violet-500 hover:text-violet-700 font-bold"
+                    onclick="showScreen('${p.id}');event.stopPropagation()">Screen →</button>
+          </div>
+        </div>`;
     }).join('');
   }
 
@@ -880,54 +806,56 @@
   }
 
   // ── CANDIDATE INPUTS ──────────────────────────────────
-  // keyed by candidate input id → extracted resume text
   const resumeTexts = {};
 
-  function resetCandidateInputs() {
-    clearAllCandidates(true);
-  }
+  function resetCandidateInputs() { clearAllCandidates(true); }
 
   function addCandidateInput() {
     candidateInputCount++;
     const id = candidateInputCount;
     const list = document.getElementById('candidates-input-list');
     const el = document.createElement('div');
-    el.className = 'candidate-entry';
+    el.className = 'candidate-entry bg-white border border-slate-200 rounded-xl p-4 mb-3 shadow-sm';
     el.id = `cinput-${id}`;
     el.innerHTML = `
-      <div class="candidate-entry-header">
-        <span class="candidate-num">Candidate ${id}</span>
-        <input class="candidate-name-input" type="text" placeholder="Name or label (optional)" id="cname-${id}" />
-        ${id > 1 ? `<button class="btn-ghost danger" onclick="removeCandidateInput(${id})">✕</button>` : ''}
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-bold text-violet-600 bg-violet-50 border border-violet-100 px-2.5 py-1 rounded-full">Candidate ${id}</span>
+        <input class="candidate-name-input flex-1 mx-3 input input-bordered input-sm focus:border-violet-400 text-sm" type="text" placeholder="Name or label (optional)" id="cname-${id}" />
+        ${id > 1 ? `<button class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500" onclick="removeCandidateInput(${id})">✕</button>` : ''}
       </div>
       <input type="file" id="fileinput-${id}" accept=".pdf,.docx,.txt" style="display:none" onchange="handleFileSelect(event,${id})" />
-      <div class="drop-zone" id="dropzone-${id}"
+      <div class="drop-zone border-2 border-dashed border-slate-200 rounded-xl transition-all cursor-pointer hover:border-violet-300 hover:bg-violet-50/40" id="dropzone-${id}"
            ondragover="handleDragOver(event,${id})"
            ondragleave="handleDragLeave(event,${id})"
            ondrop="handleDrop(event,${id})"
            onclick="document.getElementById('fileinput-${id}').click()">
-        <div class="drop-zone-empty" id="dz-empty-${id}">
-          <div class="dz-icon">📄</div>
-          <div class="dz-title">Drop resume file here</div>
-          <div class="dz-sub">PDF, DOCX, or TXT · or click to browse</div>
-          <button type="button" class="dz-btn" onclick="event.stopPropagation();document.getElementById('fileinput-${id}').click()">Browse Files</button>
+        <div id="dz-empty-${id}" class="p-6 text-center">
+          <div class="text-3xl mb-2">📄</div>
+          <div class="text-sm font-semibold text-slate-700 mb-1">Drop resume file here</div>
+          <div class="text-xs text-slate-400 mb-3">PDF, DOCX, or TXT · or click to browse</div>
+          <button type="button" class="btn btn-ghost btn-sm border border-slate-200 text-xs text-slate-600 hover:bg-slate-50"
+                  onclick="event.stopPropagation();document.getElementById('fileinput-${id}').click()">Browse Files</button>
         </div>
-        <div class="drop-zone-loading" id="dz-loading-${id}" style="display:none">
-          <div class="mini-spinner"></div>Extracting text from file...
+        <div id="dz-loading-${id}" class="p-6 text-center text-sm text-slate-500 hidden">
+          <div class="w-6 h-6 border-2 border-slate-200 border-t-violet-500 rounded-full spinner mx-auto mb-2"></div>
+          Extracting text from file...
         </div>
-        <div class="drop-zone-loaded" id="dz-loaded-${id}" style="display:none">
-          <div class="dz-file-icon">📄</div>
-          <div class="dz-file-info">
-            <div class="dz-file-name" id="dz-fname-${id}"></div>
-            <div class="dz-file-preview" id="dz-fpreview-${id}"></div>
+        <div id="dz-loaded-${id}" class="p-4 flex items-center gap-3 hidden">
+          <span class="text-2xl shrink-0">📄</span>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-slate-800 truncate" id="dz-fname-${id}"></div>
+            <div class="text-xs text-slate-400 mt-0.5 truncate" id="dz-fpreview-${id}"></div>
           </div>
-          <button class="dz-clear-btn" title="Remove" onclick="event.stopPropagation();clearFile(${id})">✕</button>
+          <button class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500 shrink-0"
+                  title="Remove" onclick="event.stopPropagation();clearFile(${id})">✕</button>
         </div>
       </div>
-      <div style="text-align:right;">
-        <button class="paste-toggle" onclick="togglePasteMode(${id})">or paste text instead</button>
+      <div class="text-right mt-1.5">
+        <button class="paste-toggle text-xs text-slate-400 hover:text-violet-500 underline cursor-pointer bg-transparent border-0"
+                onclick="togglePasteMode(${id})">or paste text instead</button>
       </div>
-      <textarea id="cresume-${id}" placeholder="Paste resume text here..." style="display:none;"></textarea>`;
+      <textarea id="cresume-${id}" class="textarea textarea-bordered w-full h-32 mt-2 text-sm focus:border-violet-400 leading-relaxed hidden"
+                placeholder="Paste resume text here..."></textarea>`;
     list.appendChild(el);
     updateScreenBtn();
   }
@@ -943,7 +871,7 @@
     document.getElementById('screen-btn-label').textContent =
       count === 1 ? 'Screen Candidate' : `Screen All ${count} Candidates`;
     document.getElementById('candidate-count-label').textContent =
-      count > 1 ? `${count} candidates queued` : '';
+      count > 1 ? `(${count} queued)` : '';
   }
 
   function getCandidateInputs() {
@@ -962,18 +890,15 @@
     e.preventDefault();
     document.getElementById(`dropzone-${id}`).classList.add('dragover');
   }
-
   function handleDragLeave(e, id) {
     document.getElementById(`dropzone-${id}`).classList.remove('dragover');
   }
-
   function handleDrop(e, id) {
     e.preventDefault();
     document.getElementById(`dropzone-${id}`).classList.remove('dragover');
     const file = e.dataTransfer.files[0];
     if (file) uploadFile(file, id);
   }
-
   function handleFileSelect(e, id) {
     const file = e.target.files[0];
     if (file) uploadFile(file, id);
@@ -983,8 +908,8 @@
     const ta = document.getElementById(`cresume-${id}`);
     const dz = document.getElementById(`dropzone-${id}`);
     const btn = document.querySelector(`#cinput-${id} .paste-toggle`);
-    const pasteVisible = ta.style.display !== 'none';
-    ta.style.display = pasteVisible ? 'none' : 'block';
+    const pasteVisible = !ta.classList.contains('hidden');
+    ta.classList.toggle('hidden', pasteVisible);
     dz.style.display = pasteVisible ? 'block' : 'none';
     btn.textContent = pasteVisible ? 'or paste text instead' : 'or upload a file instead';
   }
@@ -996,17 +921,14 @@
       alert(`Unsupported file type: ${ext}. Use PDF, DOCX, or TXT.`);
       return;
     }
+    document.getElementById(`dz-empty-${id}`).classList.add('hidden');
+    document.getElementById(`dz-loaded-${id}`).classList.add('hidden');
+    document.getElementById(`dz-loading-${id}`).classList.remove('hidden');
 
-    document.getElementById(`dz-empty-${id}`).style.display = 'none';
-    document.getElementById(`dz-loaded-${id}`).style.display = 'none';
-    document.getElementById(`dz-loading-${id}`).style.display = 'block';
-
-    // auto-fill name from filename if empty
     const nameInput = document.getElementById(`cname-${id}`);
     if (!nameInput.value.trim()) {
       nameInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
     }
-
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -1017,19 +939,19 @@
       resumeTexts[id] = data.text;
       document.getElementById(`dz-fname-${id}`).textContent = data.filename;
       document.getElementById(`dz-fpreview-${id}`).textContent = data.text.substring(0, 100) + '…';
-      document.getElementById(`dz-loading-${id}`).style.display = 'none';
-      document.getElementById(`dz-loaded-${id}`).style.display = 'flex';
+      document.getElementById(`dz-loading-${id}`).classList.add('hidden');
+      document.getElementById(`dz-loaded-${id}`).classList.remove('hidden');
     } catch (err) {
-      document.getElementById(`dz-loading-${id}`).style.display = 'none';
-      document.getElementById(`dz-empty-${id}`).style.display = 'block';
+      document.getElementById(`dz-loading-${id}`).classList.add('hidden');
+      document.getElementById(`dz-empty-${id}`).classList.remove('hidden');
       alert('Could not read file: ' + err.message);
     }
   }
 
   function clearFile(id) {
     delete resumeTexts[id];
-    document.getElementById(`dz-loaded-${id}`).style.display = 'none';
-    document.getElementById(`dz-empty-${id}`).style.display = 'block';
+    document.getElementById(`dz-loaded-${id}`).classList.add('hidden');
+    document.getElementById(`dz-empty-${id}`).classList.remove('hidden');
     document.getElementById(`fileinput-${id}`).value = '';
   }
 
@@ -1057,18 +979,14 @@
       alert('No supported files found. Use PDF, DOCX, or TXT.');
       return;
     }
-
-    // Show progress bar
     const progressEl = document.getElementById('batch-parse-progress');
-    const barEl = document.getElementById('batch-progress-bar');
-    const labelEl = document.getElementById('bp-label');
-    progressEl.style.display = 'block';
+    const barEl      = document.getElementById('batch-progress-bar');
+    const labelEl    = document.getElementById('bp-label');
+    progressEl.classList.remove('hidden');
     barEl.style.width = '0%';
     labelEl.textContent = `Parsing 0 of ${supported.length} files...`;
 
     let completed = 0;
-
-    // Parse all in parallel
     const results = await Promise.allSettled(supported.map(async file => {
       const formData = new FormData();
       formData.append('file', file);
@@ -1085,12 +1003,11 @@
       };
     }));
 
-    progressEl.style.display = 'none';
+    progressEl.classList.add('hidden');
 
     const succeeded = results.filter(r => r.status === 'fulfilled').map(r => r.value);
     const failed = results.filter(r => r.status === 'rejected').length;
 
-    // Clear any existing empty entries and append new ones
     clearAllCandidates(false);
 
     for (const parsed of succeeded) {
@@ -1100,13 +1017,11 @@
       resumeTexts[id] = parsed.text;
       document.getElementById(`dz-fname-${id}`).textContent = parsed.filename;
       document.getElementById(`dz-fpreview-${id}`).textContent = parsed.text.substring(0, 100) + '…';
-      document.getElementById(`dz-empty-${id}`).style.display = 'none';
-      document.getElementById(`dz-loading-${id}`).style.display = 'none';
-      document.getElementById(`dz-loaded-${id}`).style.display = 'flex';
+      document.getElementById(`dz-empty-${id}`).classList.add('hidden');
+      document.getElementById(`dz-loading-${id}`).classList.add('hidden');
+      document.getElementById(`dz-loaded-${id}`).classList.remove('hidden');
     }
-
     updateScreenBtn();
-
     if (failed > 0) alert(`${succeeded.length} files loaded. ${failed} could not be parsed.`);
   }
 
@@ -1122,17 +1037,15 @@
   async function runScreening() {
     const inputs = getCandidateInputs();
     const valid = inputs.filter(e => e.resume);
-    const errBox = document.getElementById('screen-error');
-    errBox.style.display = 'none';
+    const errEl = document.getElementById('screen-error');
+    errEl.classList.add('hidden');
 
     if (!valid.length) {
-      errBox.textContent = 'Please paste at least one resume before screening.';
-      errBox.style.display = 'block';
+      errEl.textContent = 'Please add at least one resume before screening.';
+      errEl.classList.remove('hidden');
       return;
     }
-
     const jd = getProfile(currentProfileId)?.jobDescription || '';
-
     if (valid.length === 1) {
       await doScreenSingle(jd, valid[0]);
     } else {
@@ -1162,16 +1075,15 @@
       showCandidateProfile(cid);
     } catch (err) {
       showView('screen-view');
-      const errBox = document.getElementById('screen-error');
-      errBox.textContent = 'Error: ' + err.message;
-      errBox.style.display = 'block';
+      const errEl = document.getElementById('screen-error');
+      errEl.textContent = 'Error: ' + err.message;
+      errEl.classList.remove('hidden');
     }
   }
 
   async function doScreenBatch(jd, inputs) {
     showView('loading-view');
     lastBatchCandidateIds = [];
-
     for (let i = 0; i < inputs.length; i++) {
       document.getElementById('loading-progress').textContent = `Screening candidate ${i + 1} of ${inputs.length}...`;
       try {
@@ -1193,7 +1105,7 @@
       } catch (err) {
         showView('screen-view');
         document.getElementById('screen-error').textContent = `Error on candidate ${i + 1}: ${err.message}`;
-        document.getElementById('screen-error').style.display = 'block';
+        document.getElementById('screen-error').classList.remove('hidden');
         return;
       }
     }
@@ -1217,32 +1129,42 @@
     const candidates = (profile?.candidates || []).filter(c => lastBatchCandidateIds.includes(c.id));
     const sorted = [...candidates].sort((a, b) => (b.resume_score || 0) - (a.resume_score || 0));
 
-    const passed = sorted.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
+    const passed    = sorted.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
     const totalTime = sorted.reduce((s, c) => s + parseFloat(c.screening_time_seconds || 0), 0).toFixed(1);
-    const savedMin = Math.round((180 * sorted.length - totalTime) / 60);
+    const savedMin  = Math.round((180 * sorted.length - totalTime) / 60);
 
-    document.getElementById('batch-summary').innerHTML = `
-      <div class="batch-stat"><div class="num">${sorted.length}</div><div class="lbl">Screened</div></div>
-      <div class="batch-stat"><div class="num" style="color:#1e40af">${passed}</div><div class="lbl">Passed (≥${THRESHOLD})</div></div>
-      <div class="batch-stat"><div class="num" style="color:#065f46">${sorted.filter(c=>c.decision==='ADVANCE').length}</div><div class="lbl">AI Advance</div></div>
-      <div class="batch-stat"><div class="num">${totalTime}s</div><div class="lbl">Total Time</div></div>
-      <div class="batch-stat"><div class="num">~${savedMin}m</div><div class="lbl">Saved</div></div>`;
+    const statCard = (num, label, color = 'text-slate-800') =>
+      `<div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+        <div class="text-2xl font-extrabold ${color}">${num}</div>
+        <div class="text-xs text-slate-400 mt-1 font-medium">${label}</div>
+      </div>`;
 
-    const medals = ['gold', 'silver', 'bronze'];
+    document.getElementById('batch-summary').innerHTML =
+      statCard(sorted.length, 'Screened') +
+      statCard(passed, `Passed (≥${THRESHOLD})`, 'text-indigo-600') +
+      statCard(sorted.filter(c => c.decision === 'ADVANCE').length, 'AI Advance', 'text-emerald-600') +
+      statCard(totalTime + 's', 'Total Time', 'text-violet-600') +
+      statCard('~' + savedMin + 'm', 'Time Saved', 'text-amber-500');
+
+    const medals = ['text-amber-400', 'text-slate-400', 'text-orange-600'];
     document.getElementById('rank-tbody').innerHTML = sorted.map((c, i) => {
-      const score = c.resume_score || 0;
+      const score  = c.resume_score || 0;
       const passes = score >= THRESHOLD;
-      const col = scoreColor(score);
-      return `<tr onclick="showCandidateProfile('${c.id}')">
-        <td><span class="rank-num ${medals[i] || ''}">#${i + 1}</span></td>
-        <td style="font-weight:600;font-size:0.92rem;">${esc(c.name)}</td>
-        <td><span style="font-weight:800;color:${col}">${score}</span>
-            <div class="mini-bar-wrap"><div class="mini-bar" style="width:${score}%;background:${col};"></div></div></td>
-        <td><span class="threshold-badge ${passes ? 'pass' : 'fail'}">${passes ? '✓ Pass' : '✗ Fail'}</span></td>
-        <td><span class="decision-pill ${c.decision === 'ADVANCE' ? 'advance' : 'reject'}">${c.decision}</span></td>
-        <td style="color:${scoreColor(c.scores?.skills_match)}">${c.scores?.skills_match ?? '–'}</td>
-        <td style="color:${scoreColor(c.scores?.experience_level)}">${c.scores?.experience_level ?? '–'}</td>
-        <td style="color:${scoreColor(c.scores?.education_fit)}">${c.scores?.education_fit ?? '–'}</td>
+      const col    = scoreColor(score);
+      return `<tr class="hover:bg-slate-50 cursor-pointer transition-colors" onclick="showCandidateProfile('${c.id}')">
+        <td class="font-black text-lg ${medals[i] || 'text-slate-300'}">#${i + 1}</td>
+        <td class="font-semibold text-sm text-slate-800">${esc(c.name)}</td>
+        <td>
+          <span class="font-extrabold" style="color:${col}">${score}</span>
+          <div class="inline-block w-16 h-1.5 bg-slate-100 rounded-full ml-2 align-middle overflow-hidden">
+            <div class="h-full rounded-full" style="width:${score}%;background:${col};"></div>
+          </div>
+        </td>
+        <td><span class="text-xs font-bold px-2 py-0.5 rounded-full ${passes ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}">${passes ? '✓ Pass' : '✗ Fail'}</span></td>
+        <td><span class="text-xs font-bold px-2 py-0.5 rounded-full ${c.decision === 'ADVANCE' ? 'bg-violet-50 text-violet-700' : 'bg-amber-50 text-amber-700'}">${c.decision}</span></td>
+        <td style="color:${scoreColor(c.scores?.skills_match)}" class="font-semibold text-sm">${c.scores?.skills_match ?? '–'}</td>
+        <td style="color:${scoreColor(c.scores?.experience_level)}" class="font-semibold text-sm">${c.scores?.experience_level ?? '–'}</td>
+        <td style="color:${scoreColor(c.scores?.education_fit)}" class="font-semibold text-sm">${c.scores?.education_fit ?? '–'}</td>
       </tr>`;
     }).join('');
 
@@ -1263,8 +1185,8 @@
       profiles[pIdx].candidates[cIdx].notes = text;
       saveProfiles(profiles);
       const indicator = document.getElementById('notes-saved-indicator');
-      indicator.style.display = 'inline';
-      setTimeout(() => indicator.style.display = 'none', 2000);
+      indicator.classList.remove('hidden');
+      setTimeout(() => indicator.classList.add('hidden'), 2000);
     }, 600);
   }
 
@@ -1282,29 +1204,25 @@
       const res = await fetch('/questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jobDescription: profile.jobDescription,
-          resume: c.resume,
-          candidateName: c.name,
-        }),
+        body: JSON.stringify({ jobDescription: profile.jobDescription, resume: c.resume, candidateName: c.name }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
       const container = document.getElementById('questions-container');
-      const allText = (data.questions || []).map((q, i) =>
-        `${i+1}. [${q.category}] ${q.question}`).join('\n');
+      const allText = (data.questions || []).map((q, i) => `${i+1}. [${q.category}] ${q.question}`).join('\n');
 
       container.innerHTML = `
-        <div style="margin-bottom:10px;">
+        <div class="divide-y divide-slate-50">
           ${(data.questions || []).map(q => `
-            <div class="question-item">
-              <div class="question-category">${esc(q.category)}</div>
-              <div class="question-text">${esc(q.question)}</div>
-              <div class="question-why">${esc(q.why)}</div>
+            <div class="py-3">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">${esc(q.category)}</div>
+              <div class="text-sm font-semibold text-slate-800 mb-1 leading-snug">${esc(q.question)}</div>
+              <div class="text-xs text-slate-400 italic">${esc(q.why)}</div>
             </div>`).join('')}
         </div>
-        <button class="copy-btn" onclick="copyText(${JSON.stringify(allText)})">Copy All Questions</button>`;
+        <button class="btn btn-ghost btn-sm mt-2 border border-slate-200 text-xs text-slate-500 hover:bg-slate-50"
+                onclick="copyText(${JSON.stringify(allText)})">Copy All Questions</button>`;
       container.style.display = 'block';
       btn.textContent = 'Regenerate';
       btn.disabled = false;
@@ -1343,11 +1261,11 @@
       const container = document.getElementById('email-container');
       const fullEmail = `Subject: ${data.subject}\n\n${data.body}`;
       container.innerHTML = `
-        <div class="email-subject">Subject: <span>${esc(data.subject)}</span></div>
-        <div class="email-body">${esc(data.body)}</div>
-        <div class="email-actions">
-          <button class="copy-btn" onclick="copyText(${JSON.stringify(fullEmail)})">Copy Email</button>
-          <button class="regen-btn" onclick="generateEmail()">Regenerate</button>
+        <div class="text-xs font-bold text-slate-500 mb-2">Subject: <span class="font-normal text-slate-800">${esc(data.subject)}</span></div>
+        <div class="bg-slate-50 border border-slate-100 rounded-lg p-4 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap mb-3">${esc(data.body)}</div>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost btn-sm border border-slate-200 text-xs text-slate-500" onclick="copyText(${JSON.stringify(fullEmail)})">Copy Email</button>
+          <button class="btn btn-ghost btn-sm text-xs text-slate-400" onclick="generateEmail()">Regenerate</button>
         </div>`;
       container.style.display = 'block';
       btn.textContent = 'Regenerate';
@@ -1393,31 +1311,34 @@
 
   // ── HELPERS ───────────────────────────────────────────
   function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      const btns = document.querySelectorAll('.copy-btn');
-      btns.forEach(b => { if (b.onclick?.toString().includes(text.substring(0,20))) { b.textContent = 'Copied!'; setTimeout(() => b.textContent = 'Copy Email' in text ? 'Copy Email' : 'Copy All Questions', 2000); }});
-    });
     navigator.clipboard.writeText(text);
   }
 
-  function scoreColor(val) { return val >= 70 ? '#10b981' : val >= 45 ? '#f59e0b' : '#ef4444'; }
-  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function scoreColor(val) {
+    return val >= 70 ? '#10b981' : val >= 45 ? '#f59e0b' : '#ef4444';
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   function csvCell(s) { return `"${String(s).replace(/"/g,'""')}"`; }
   function slugify(s) { return s.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''); }
 
   function toggleResume() {
-    const el = document.getElementById('resume-text-display');
+    const el  = document.getElementById('resume-text-display');
     const btn = document.querySelector('.resume-toggle');
-    const isShown = el.style.display !== 'none';
-    el.style.display = isShown ? 'none' : 'block';
+    const isShown = !el.classList.contains('hidden');
+    el.classList.toggle('hidden', isShown);
     btn.textContent = isShown ? 'Show Resume Text' : 'Hide Resume Text';
   }
 
   function copyCandidateSummary() {
     navigator.clipboard.writeText(document.getElementById('candidate-summary').textContent).then(() => {
-      const btn = document.querySelector('.copy-btn');
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy to Clipboard', 2000);
+      const btn = document.querySelector('.card-body .btn-ghost[onclick="copyCandidateSummary()"]');
+      if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy to Clipboard', 2000); }
     });
   }
 
