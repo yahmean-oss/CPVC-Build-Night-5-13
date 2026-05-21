@@ -102,6 +102,41 @@
     .ai-badge.advance { background: #ede9fe; color: #4c1d95; }
     .ai-badge.reject  { background: #fef3c7; color: #92400e; }
 
+    /* FILTER BAR */
+    .filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .filter-chip { padding: 5px 13px; border-radius: 16px; font-size: 0.78rem; font-weight: 600; border: 1.5px solid #e5e7eb; background: white; cursor: pointer; transition: all 0.15s; color: #6b7280; }
+    .filter-chip:hover { border-color: #4f46e5; color: #4f46e5; }
+    .filter-chip.active { background: #4f46e5; border-color: #4f46e5; color: white; }
+    .filter-chip.active-green  { background: #059669; border-color: #059669; color: white; }
+    .filter-chip.active-red    { background: #dc2626; border-color: #dc2626; color: white; }
+    .filter-chip.active-gray   { background: #6b7280; border-color: #6b7280; color: white; }
+    .filter-chip.active-yellow { background: #d97706; border-color: #d97706; color: white; }
+    .sort-select { margin-left: auto; padding: 5px 10px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 0.78rem; font-family: inherit; color: #374151; background: white; cursor: pointer; }
+
+    /* NOTES */
+    .notes-textarea { width: 100%; min-height: 90px; padding: 12px; border: 1.5px solid #e5e7eb; border-radius: 9px; font-size: 0.88rem; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.2s; }
+    .notes-textarea:focus { outline: none; border-color: #4f46e5; }
+    .notes-saved { font-size: 0.75rem; color: #10b981; margin-top: 6px; display: none; }
+
+    /* QUESTIONS */
+    .question-item { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+    .question-item:last-child { border-bottom: none; }
+    .question-category { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #9ca3af; margin-bottom: 4px; }
+    .question-text { font-size: 0.92rem; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; line-height: 1.5; }
+    .question-why { font-size: 0.8rem; color: #6b7280; font-style: italic; }
+    .gen-btn { background: #ede9fe; color: #3730a3; border: 1px solid #c4b5fd; padding: 9px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .gen-btn:hover { background: #4f46e5; color: white; border-color: #4f46e5; }
+    .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .gen-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+
+    /* EMAIL DRAFT */
+    .email-subject { font-size: 0.82rem; font-weight: 700; color: #374151; margin-bottom: 6px; }
+    .email-subject span { font-weight: 400; color: #1a1a2e; }
+    .email-body { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; font-size: 0.88rem; line-height: 1.7; color: #374151; white-space: pre-wrap; margin-bottom: 10px; }
+    .email-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .regen-btn { background: none; border: 1px solid #e5e7eb; padding: 6px 14px; border-radius: 7px; font-size: 0.8rem; cursor: pointer; color: #6b7280; transition: background 0.2s; }
+    .regen-btn:hover { background: #f3f4f6; }
+
     /* ── SCREEN VIEW ── */
     .screen-job-banner { background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 10px; padding: 13px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .screen-job-banner span { font-size: 0.9rem; color: #4c1d95; font-weight: 600; }
@@ -302,6 +337,20 @@
       <h3 id="candidates-section-title">Candidates</h3>
       <button class="btn-primary" onclick="showScreen(currentProfileId)">+ Screen New Candidate</button>
     </div>
+    <div class="filter-bar" id="candidate-filter-bar" style="display:none;">
+      <button class="filter-chip active" data-filter="all"      onclick="setFilter('all')">All</button>
+      <button class="filter-chip"        data-filter="passed"   onclick="setFilter('passed')">✓ Passed</button>
+      <button class="filter-chip"        data-filter="failed"   onclick="setFilter('failed')">✗ Below</button>
+      <button class="filter-chip"        data-filter="pending"  onclick="setFilter('pending')">Pending</button>
+      <button class="filter-chip"        data-filter="advanced" onclick="setFilter('advanced')">Advanced</button>
+      <button class="filter-chip"        data-filter="denied"   onclick="setFilter('denied')">Denied</button>
+      <select class="sort-select" id="sort-select" onchange="rerenderCandidates()">
+        <option value="score-desc">Score: High → Low</option>
+        <option value="score-asc">Score: Low → High</option>
+        <option value="date-desc">Newest First</option>
+        <option value="date-asc">Oldest First</option>
+      </select>
+    </div>
     <div id="candidates-list-view"></div>
   </div>
 
@@ -415,6 +464,34 @@
       <button class="copy-btn" onclick="copyCandidateSummary()">Copy to Clipboard</button>
     </div>
 
+    <!-- Notes -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="gen-section-header">
+        <h3>Recruiter Notes</h3>
+        <span class="notes-saved" id="notes-saved-indicator">Saved ✓</span>
+      </div>
+      <textarea class="notes-textarea" id="candidate-notes" placeholder="Add your own observations, flags, or reminders about this candidate..." oninput="autoSaveNotes()"></textarea>
+    </div>
+
+    <!-- Interview Questions -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="gen-section-header">
+        <h3>Interview Questions</h3>
+        <button class="gen-btn" id="gen-questions-btn" onclick="generateQuestions()">Generate Questions</button>
+      </div>
+      <div id="questions-container" style="display:none;"></div>
+    </div>
+
+    <!-- Email Draft -->
+    <div class="card" style="margin-bottom:16px;" id="email-card">
+      <div class="gen-section-header">
+        <h3>Email Draft</h3>
+        <button class="gen-btn" id="gen-email-btn" onclick="generateEmail()">Generate Email</button>
+      </div>
+      <div id="email-container" style="display:none;"></div>
+    </div>
+
+    <!-- Resume -->
     <div class="card">
       <h3>Resume</h3>
       <button class="resume-toggle" onclick="toggleResume()">Show Resume Text</button>
@@ -552,27 +629,20 @@
     document.getElementById('candidates-section-title').textContent =
       candidates.length ? `${candidates.length} Candidate${candidates.length !== 1 ? 's' : ''}` : 'No candidates yet';
 
-    const listEl = document.getElementById('candidates-list-view');
+    const filterBar = document.getElementById('candidate-filter-bar');
+    filterBar.style.display = candidates.length ? 'flex' : 'none';
+
+    activeFilter = 'all';
+    document.querySelectorAll('.filter-chip').forEach(c => {
+      c.className = 'filter-chip' + (c.dataset.filter === 'all' ? ' active' : '');
+    });
+
     if (!candidates.length) {
-      listEl.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-size:0.9rem;">
-        No candidates screened yet. Click "Screen New Candidate" to get started.</div>`;
+      document.getElementById('candidates-list-view').innerHTML =
+        `<div style="text-align:center;padding:40px;color:#9ca3af;font-size:0.9rem;">
+          No candidates screened yet. Click "Screen New Candidate" to get started.</div>`;
     } else {
-      listEl.innerHTML = candidates.map(c => {
-        const score = c.resume_score || 0;
-        const passes = score >= THRESHOLD;
-        const color = scoreColor(score);
-        return `<div class="candidate-row" onclick="showCandidateProfile('${c.id}')">
-          <div class="score-circle" style="background:${color}18;color:${color};">${score}</div>
-          <div class="candidate-row-info">
-            <div class="cname">${esc(c.name || 'Unnamed Candidate')}</div>
-            <div class="cdate">${c.screenedAt}</div>
-          </div>
-          <span class="threshold-badge ${passes ? 'pass' : 'fail'}">${passes ? '✓ Passes' : '✗ Below'} ${THRESHOLD}</span>
-          <span class="ai-badge ${c.decision === 'ADVANCE' ? 'advance' : 'reject'}">AI: ${c.decision}</span>
-          <span class="status-badge ${c.status}">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
-          <span style="color:#9ca3af;font-size:1.1rem;margin-left:auto;">›</span>
-        </div>`;
-      }).join('');
+      rerenderCandidates();
     }
 
     showView('job-detail-view');
@@ -636,7 +706,80 @@
     document.getElementById('resume-text-display').style.display = 'none';
     document.querySelector('.resume-toggle').textContent = 'Show Resume Text';
 
+    // Notes
+    document.getElementById('candidate-notes').value = c.notes || '';
+    document.getElementById('notes-saved-indicator').style.display = 'none';
+
+    // Reset generated sections
+    document.getElementById('questions-container').style.display = 'none';
+    document.getElementById('questions-container').innerHTML = '';
+    document.getElementById('gen-questions-btn').textContent = 'Generate Questions';
+    document.getElementById('gen-questions-btn').disabled = false;
+    document.getElementById('email-container').style.display = 'none';
+    document.getElementById('email-container').innerHTML = '';
+    document.getElementById('gen-email-btn').textContent = 'Generate Email';
+    document.getElementById('gen-email-btn').disabled = false;
+
     showView('candidate-view');
+  }
+
+  // ── FILTER / SORT ─────────────────────────────────────
+  let activeFilter = 'all';
+
+  function setFilter(filter) {
+    activeFilter = filter;
+    document.querySelectorAll('.filter-chip').forEach(c => {
+      c.className = 'filter-chip';
+      if (c.dataset.filter === filter) {
+        const colorMap = { all:'active', passed:'active-green', failed:'active-red', pending:'active-gray', advanced:'active-green', denied:'active-red' };
+        c.classList.add(colorMap[filter] || 'active');
+      }
+    });
+    rerenderCandidates();
+  }
+
+  function rerenderCandidates() {
+    const profile = getProfile(currentProfileId);
+    if (!profile) return;
+    let candidates = [...(profile.candidates || [])];
+
+    if (activeFilter === 'passed')   candidates = candidates.filter(c => (c.resume_score||0) >= THRESHOLD);
+    if (activeFilter === 'failed')   candidates = candidates.filter(c => (c.resume_score||0) <  THRESHOLD);
+    if (activeFilter === 'pending')  candidates = candidates.filter(c => c.status === 'pending');
+    if (activeFilter === 'advanced') candidates = candidates.filter(c => c.status === 'advanced');
+    if (activeFilter === 'denied')   candidates = candidates.filter(c => c.status === 'denied');
+
+    const sort = document.getElementById('sort-select')?.value || 'score-desc';
+    if (sort === 'score-desc') candidates.sort((a,b) => (b.resume_score||0) - (a.resume_score||0));
+    if (sort === 'score-asc')  candidates.sort((a,b) => (a.resume_score||0) - (b.resume_score||0));
+    if (sort === 'date-desc')  candidates.sort((a,b) => b.id.localeCompare(a.id));
+    if (sort === 'date-asc')   candidates.sort((a,b) => a.id.localeCompare(b.id));
+
+    renderCandidateRows(candidates);
+  }
+
+  function renderCandidateRows(candidates) {
+    const listEl = document.getElementById('candidates-list-view');
+    if (!candidates.length) {
+      listEl.innerHTML = `<div style="text-align:center;padding:30px;color:#9ca3af;font-size:0.88rem;">No candidates match this filter.</div>`;
+      return;
+    }
+    listEl.innerHTML = candidates.map(c => {
+      const score = c.resume_score || 0;
+      const passes = score >= THRESHOLD;
+      const color = scoreColor(score);
+      return `<div class="candidate-row" onclick="showCandidateProfile('${c.id}')">
+        <div class="score-circle" style="background:${color}18;color:${color};">${score}</div>
+        <div class="candidate-row-info">
+          <div class="cname">${esc(c.name || 'Unnamed Candidate')}</div>
+          <div class="cdate">${c.screenedAt}</div>
+        </div>
+        <span class="threshold-badge ${passes ? 'pass' : 'fail'}">${passes ? '✓ Passes' : '✗ Below'} ${THRESHOLD}</span>
+        <span class="ai-badge ${c.decision === 'ADVANCE' ? 'advance' : 'reject'}">AI: ${c.decision}</span>
+        <span class="status-badge ${c.status}">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
+        <span style="color:#9ca3af;font-size:1.1rem;margin-left:auto;">›</span>
+      </div>`;
+    }).join('');
   }
 
   // ── DECISIONS ─────────────────────────────────────────
@@ -1106,6 +1249,116 @@
     showView('batch-results-view');
   }
 
+  // ── NOTES ─────────────────────────────────────────────
+  let notesSaveTimer = null;
+  function autoSaveNotes() {
+    clearTimeout(notesSaveTimer);
+    notesSaveTimer = setTimeout(() => {
+      const text = document.getElementById('candidate-notes').value;
+      const profiles = getProfiles();
+      const pIdx = profiles.findIndex(p => p.id === currentProfileId);
+      if (pIdx === -1) return;
+      const cIdx = (profiles[pIdx].candidates || []).findIndex(c => c.id === currentCandidateId);
+      if (cIdx === -1) return;
+      profiles[pIdx].candidates[cIdx].notes = text;
+      saveProfiles(profiles);
+      const indicator = document.getElementById('notes-saved-indicator');
+      indicator.style.display = 'inline';
+      setTimeout(() => indicator.style.display = 'none', 2000);
+    }, 600);
+  }
+
+  // ── INTERVIEW QUESTIONS ───────────────────────────────
+  async function generateQuestions() {
+    const c = getCandidate(currentProfileId, currentCandidateId);
+    const profile = getProfile(currentProfileId);
+    if (!c || !profile) return;
+
+    const btn = document.getElementById('gen-questions-btn');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+
+    try {
+      const res = await fetch('/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobDescription: profile.jobDescription,
+          resume: c.resume,
+          candidateName: c.name,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      const container = document.getElementById('questions-container');
+      const allText = (data.questions || []).map((q, i) =>
+        `${i+1}. [${q.category}] ${q.question}`).join('\n');
+
+      container.innerHTML = `
+        <div style="margin-bottom:10px;">
+          ${(data.questions || []).map(q => `
+            <div class="question-item">
+              <div class="question-category">${esc(q.category)}</div>
+              <div class="question-text">${esc(q.question)}</div>
+              <div class="question-why">${esc(q.why)}</div>
+            </div>`).join('')}
+        </div>
+        <button class="copy-btn" onclick="copyText(${JSON.stringify(allText)})">Copy All Questions</button>`;
+      container.style.display = 'block';
+      btn.textContent = 'Regenerate';
+      btn.disabled = false;
+    } catch (err) {
+      btn.textContent = 'Generate Questions';
+      btn.disabled = false;
+      alert('Error: ' + err.message);
+    }
+  }
+
+  // ── EMAIL DRAFT ───────────────────────────────────────
+  async function generateEmail() {
+    const c = getCandidate(currentProfileId, currentCandidateId);
+    const profile = getProfile(currentProfileId);
+    if (!c) return;
+
+    const btn = document.getElementById('gen-email-btn');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+
+    try {
+      const res = await fetch('/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateName: c.name,
+          jobTitle: profile?.name || 'the position',
+          decision: c.status !== 'pending' ? c.status : (c.decision === 'ADVANCE' ? 'advanced' : 'denied'),
+          decisionReason: c.decision_reason,
+          summary: c.summary,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      const container = document.getElementById('email-container');
+      const fullEmail = `Subject: ${data.subject}\n\n${data.body}`;
+      container.innerHTML = `
+        <div class="email-subject">Subject: <span>${esc(data.subject)}</span></div>
+        <div class="email-body">${esc(data.body)}</div>
+        <div class="email-actions">
+          <button class="copy-btn" onclick="copyText(${JSON.stringify(fullEmail)})">Copy Email</button>
+          <button class="regen-btn" onclick="generateEmail()">Regenerate</button>
+        </div>`;
+      container.style.display = 'block';
+      btn.textContent = 'Regenerate';
+      btn.disabled = false;
+    } catch (err) {
+      btn.textContent = 'Generate Email';
+      btn.disabled = false;
+      alert('Error: ' + err.message);
+    }
+  }
+
   // ── CSV EXPORT ────────────────────────────────────────
   function exportCandidateCSV() {
     const c = getCandidate(currentProfileId, currentCandidateId);
@@ -1139,6 +1392,14 @@
   }
 
   // ── HELPERS ───────────────────────────────────────────
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btns = document.querySelectorAll('.copy-btn');
+      btns.forEach(b => { if (b.onclick?.toString().includes(text.substring(0,20))) { b.textContent = 'Copied!'; setTimeout(() => b.textContent = 'Copy Email' in text ? 'Copy Email' : 'Copy All Questions', 2000); }});
+    });
+    navigator.clipboard.writeText(text);
+  }
+
   function scoreColor(val) { return val >= 70 ? '#10b981' : val >= 45 ? '#f59e0b' : '#ef4444'; }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function csvCell(s) { return `"${String(s).replace(/"/g,'""')}"`; }
