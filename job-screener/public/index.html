@@ -28,7 +28,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner { animation: spin 0.8s linear infinite; }
 
-    /* Filter chips — JS adds/removes active classes */
+    /* ── FILTER CHIPS ─────────────────────────────────── */
     .filter-chip {
       display: inline-flex; align-items: center; padding: 5px 14px;
       border-radius: 999px; font-size: 0.78rem; font-weight: 600;
@@ -42,7 +42,7 @@
     .filter-chip.active-gray    { background: #6b7280; border-color: #6b7280; color: white; }
     .filter-chip.active-yellow  { background: #d97706; border-color: #d97706; color: white; }
 
-    /* Strictness buttons — JS toggles active-* classes */
+    /* ── STRICTNESS BUTTONS ───────────────────────────── */
     .strictness-btn {
       padding: 6px 18px; border-radius: 999px; font-size: 0.83rem; font-weight: 600;
       border: 2px solid #e5e7eb; background: white; cursor: pointer;
@@ -52,7 +52,7 @@
     .strictness-btn.active-balanced { border-color: #7c3aed; background: #ede9fe; color: #5b21b6; }
     .strictness-btn.active-strict   { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
 
-    /* Decision buttons — JS toggles .selected */
+    /* ── DECISION BUTTONS ─────────────────────────────── */
     .decision-btn {
       padding: 9px 16px; border: 2px solid transparent; border-radius: 10px;
       font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
@@ -66,17 +66,111 @@
     .decision-btn.pending-btn { background: #f3f4f6; color: #6b7280; border-color: #e5e7eb; }
     .decision-btn.pending-btn.selected  { background: #6b7280; color: white; border-color: #6b7280; }
 
-    /* Drop zones — JS toggles .dragover */
+    /* ── DROP ZONES ───────────────────────────────────── */
     .drop-zone.dragover        { border-color: #7c3aed !important; background: #f5f3ff !important; }
     .batch-upload-zone.dragover { border-color: #7c3aed !important; background: #f5f3ff !important; }
 
     /* Score bar animation */
     .score-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
 
-    /* Custom scrollbar */
+    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
+
+    /* ════════════════════════════════════════════════════
+       DARK MODE OVERRIDES  (data-theme="dark")
+       DaisyUI dark theme: base-100 #1d232a, base-200 #191e24
+       ════════════════════════════════════════════════════ */
+    [data-theme="dark"] body               { background-color: #191e24; color: #a6adbb; }
+    [data-theme="dark"] ::-webkit-scrollbar-track { background: #191e24; }
+
+    /* Backgrounds */
+    [data-theme="dark"] .bg-white          { background-color: #1d232a !important; }
+    [data-theme="dark"] .bg-slate-50       { background-color: #191e24 !important; }
+    [data-theme="dark"] .bg-slate-100      { background-color: #242b33 !important; }
+    [data-theme="dark"] .bg-violet-50      { background-color: rgba(109,40,217,0.18) !important; }
+    [data-theme="dark"] .bg-violet-50\/60  { background-color: rgba(109,40,217,0.12) !important; }
+    [data-theme="dark"] .bg-emerald-50     { background-color: rgba(5,150,105,0.15) !important; }
+    [data-theme="dark"] .bg-rose-50        { background-color: rgba(220,38,38,0.15) !important; }
+    [data-theme="dark"] .bg-amber-50       { background-color: rgba(217,119,6,0.15) !important; }
+    [data-theme="dark"] .bg-indigo-50      { background-color: rgba(79,70,229,0.15) !important; }
+
+    /* Borders */
+    [data-theme="dark"] .border-slate-200  { border-color: rgba(255,255,255,0.08) !important; }
+    [data-theme="dark"] .border-slate-100  { border-color: rgba(255,255,255,0.05) !important; }
+    [data-theme="dark"] .border-violet-200 { border-color: rgba(139,92,246,0.35) !important; }
+    [data-theme="dark"] .border-emerald-200{ border-color: rgba(52,211,153,0.25) !important; }
+    [data-theme="dark"] .border-rose-200   { border-color: rgba(252,165,165,0.2)  !important; }
+    [data-theme="dark"] .border-amber-200  { border-color: rgba(252,211,77,0.2)   !important; }
+    [data-theme="dark"] .border-violet-100 { border-color: rgba(139,92,246,0.25) !important; }
+    [data-theme="dark"] .border-emerald-100{ border-color: rgba(52,211,153,0.15) !important; }
+
+    /* Text */
+    [data-theme="dark"] .text-slate-900,
+    [data-theme="dark"] .text-slate-800   { color: #e2e8f0 !important; }
+    [data-theme="dark"] .text-slate-700   { color: #cbd5e1 !important; }
+    [data-theme="dark"] .text-slate-600   { color: #94a3b8 !important; }
+    [data-theme="dark"] .text-slate-500   { color: #64748b !important; }
+    [data-theme="dark"] .text-slate-400   { color: #475569 !important; }
+    [data-theme="dark"] .text-slate-300   { color: #334155 !important; }
+    [data-theme="dark"] .text-indigo-600  { color: #818cf8 !important; }
+    [data-theme="dark"] .text-emerald-600 { color: #34d399 !important; }
+    [data-theme="dark"] .text-rose-500    { color: #f87171 !important; }
+    [data-theme="dark"] .text-violet-800  { color: #c4b5fd !important; }
+    [data-theme="dark"] .text-violet-500  { color: #a78bfa !important; }
+    [data-theme="dark"] .text-violet-600  { color: #a78bfa !important; }
+    [data-theme="dark"] .text-violet-700  { color: #c4b5fd !important; }
+    [data-theme="dark"] .text-emerald-700 { color: #6ee7b7 !important; }
+    [data-theme="dark"] .text-rose-600    { color: #fca5a5 !important; }
+    [data-theme="dark"] .text-amber-500   { color: #fcd34d !important; }
+    [data-theme="dark"] .text-amber-600   { color: #fbbf24 !important; }
+    [data-theme="dark"] .text-amber-700   { color: #fcd34d !important; }
+    [data-theme="dark"] .text-violet-200  { color: #ddd6fe; }
+
+    /* Tinted badge backgrounds in dark */
+    [data-theme="dark"] .bg-violet-100    { background-color: rgba(139,92,246,0.2) !important; }
+    [data-theme="dark"] .bg-emerald-100   { background-color: rgba(52,211,153,0.15) !important; }
+    [data-theme="dark"] .bg-rose-100      { background-color: rgba(248,113,113,0.15) !important; }
+    [data-theme="dark"] .bg-amber-100     { background-color: rgba(251,191,36,0.15) !important; }
+    [data-theme="dark"] .text-emerald-700 { color: #6ee7b7 !important; }
+    [data-theme="dark"] .text-rose-700    { color: #fca5a5 !important; }
+
+    /* Dividers */
+    [data-theme="dark"] .divide-slate-50 > * + * { border-color: rgba(255,255,255,0.06); }
+    [data-theme="dark"] .h-px.bg-slate-100 { background-color: rgba(255,255,255,0.06) !important; }
+
+    /* Input/textarea placeholders */
+    [data-theme="dark"] input::placeholder,
+    [data-theme="dark"] textarea::placeholder { color: #475569; }
+
+    /* Custom component overrides */
+    [data-theme="dark"] .filter-chip {
+      background: #242b33; border-color: rgba(255,255,255,0.1); color: #94a3b8;
+    }
+    [data-theme="dark"] .filter-chip:hover { border-color: #a78bfa; color: #a78bfa; }
+
+    [data-theme="dark"] .strictness-btn {
+      background: #242b33; border-color: rgba(255,255,255,0.1); color: #94a3b8;
+    }
+    [data-theme="dark"] .strictness-btn.active-lenient  { background: rgba(16,185,129,0.15); border-color: #10b981; color: #6ee7b7; }
+    [data-theme="dark"] .strictness-btn.active-balanced { background: rgba(139,92,246,0.2);  border-color: #8b5cf6; color: #c4b5fd; }
+    [data-theme="dark"] .strictness-btn.active-strict   { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #fcd34d; }
+
+    [data-theme="dark"] .decision-btn.advance-btn { background: rgba(5,150,105,0.15); color: #6ee7b7; border-color: rgba(52,211,153,0.3); }
+    [data-theme="dark"] .decision-btn.deny-btn    { background: rgba(220,38,38,0.15);  color: #fca5a5; border-color: rgba(248,113,113,0.3); }
+    [data-theme="dark"] .decision-btn.pending-btn { background: #242b33; color: #64748b; border-color: rgba(255,255,255,0.08); }
+
+    [data-theme="dark"] .drop-zone { border-color: rgba(255,255,255,0.1); background: #1d232a; }
+    [data-theme="dark"] .drop-zone.dragover  { border-color: #8b5cf6 !important; background: rgba(139,92,246,0.1) !important; }
+    [data-theme="dark"] .batch-upload-zone   { border-color: rgba(139,92,246,0.3); background: rgba(109,40,217,0.08); }
+    [data-theme="dark"] .batch-upload-zone.dragover { border-color: #8b5cf6 !important; background: rgba(139,92,246,0.12) !important; }
+
+    /* Rank table hover */
+    [data-theme="dark"] .hover\:bg-slate-50:hover { background-color: #242b33 !important; }
+
+    /* Card border override */
+    [data-theme="dark"] .border-2 { border-color: rgba(255,255,255,0.08); }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen">
@@ -90,10 +184,13 @@
       <div class="text-xs text-violet-300 mt-0.5 font-medium">AI-Powered Candidate Screening</div>
     </div>
   </div>
-  <div class="flex items-center gap-2">
-    <span class="bg-white/10 border border-white/20 text-violet-200 text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">
+  <div class="flex items-center gap-3">
+    <span class="bg-white/10 border border-white/20 text-violet-200 text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm hidden sm:inline-flex">
       ⚡ Groq · Llama 3.3
     </span>
+    <button onclick="toggleTheme()" id="theme-toggle"
+            class="w-9 h-9 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl flex items-center justify-center text-lg transition-all"
+            title="Toggle dark/light mode">🌙</button>
   </div>
 </header>
 
@@ -1342,7 +1439,20 @@
     });
   }
 
+  // ── THEME TOGGLE ──────────────────────────────────────
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('theme', theme);
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+
   // ── INIT ──────────────────────────────────────────────
+  applyTheme(localStorage.getItem('theme') || 'light');
   setStrictness(2);
   renderJobCards();
 </script>
