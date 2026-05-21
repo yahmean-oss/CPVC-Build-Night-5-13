@@ -17,6 +17,8 @@ app.post('/parse', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
   const { mimetype, originalname, buffer } = req.file;
   try {
+    const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
+    console.log(`[parse] file=${originalname} mime=${mimetype} size=${buf.length}`);
     let text = '';
     if (mimetype === 'application/pdf' || originalname.endsWith('.pdf')) {
       text = await new Promise((resolve, reject) => {
@@ -27,16 +29,16 @@ app.post('/parse', upload.single('file'), async (req, res) => {
         parser.on('pdfParser_dataError', err => {
           reject(new Error(err.parserError || 'PDF parse error'));
         });
-        parser.parseBuffer(buffer);
+        parser.parseBuffer(buf);
       });
     } else if (
       mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
       originalname.endsWith('.docx')
     ) {
-      const result = await mammoth.extractRawText({ buffer });
+      const result = await mammoth.extractRawText({ buffer: buf });
       text = result.value;
     } else if (mimetype === 'text/plain' || originalname.endsWith('.txt')) {
-      text = buffer.toString('utf-8');
+      text = buf.toString('utf-8');
     } else {
       return res.status(400).json({ error: 'Unsupported file type. Use PDF, DOCX, or TXT.' });
     }
@@ -44,7 +46,7 @@ app.post('/parse', upload.single('file'), async (req, res) => {
     if (!text) return res.status(400).json({ error: 'Could not extract text from this file.' });
     res.json({ text, filename: originalname });
   } catch (err) {
-    console.error(err);
+    console.error('[parse] ERROR:', err);
     res.status(500).json({ error: 'File parsing failed: ' + err.message });
   }
 });
