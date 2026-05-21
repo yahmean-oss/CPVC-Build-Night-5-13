@@ -8,14 +8,24 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 app.use(express.json());
 app.use(express.static('public'));
 
+const STRICTNESS = {
+  1: 'Be lenient. Advance candidates who meet at least 60% of the requirements. Give the benefit of the doubt on ambiguous experience.',
+  2: 'Be balanced. Advance candidates who clearly meet approximately 75% of the requirements.',
+  3: 'Be strict. Only advance candidates who strongly meet 85% or more of the requirements with clear, specific evidence in their resume.',
+};
+
 app.post('/screen', async (req, res) => {
-  const { jobDescription, resume } = req.body;
+  const { jobDescription, resume, strictness = 2 } = req.body;
 
   if (!jobDescription?.trim() || !resume?.trim()) {
     return res.status(400).json({ error: 'Both job description and resume are required.' });
   }
 
+  const strictnessNote = STRICTNESS[strictness] || STRICTNESS[2];
+
   const prompt = `You are an expert hiring assistant. Analyze the resume against the job description and return a structured screening result.
+
+SCREENING STRICTNESS: ${strictnessNote}
 
 JOB DESCRIPTION:
 ${jobDescription}
