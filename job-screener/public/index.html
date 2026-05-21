@@ -6,331 +6,205 @@
   <title>Job Application Screener</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f6f9; color: #1a1a2e; min-height: 100vh; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f4f6f9;
-      color: #1a1a2e;
-      min-height: 100vh;
-    }
-
-    header {
-      background: #1a1a2e;
-      color: white;
-      padding: 18px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    header { background: #1a1a2e; color: white; padding: 18px 40px; display: flex; align-items: center; justify-content: space-between; }
     header h1 { font-size: 1.3rem; font-weight: 700; cursor: pointer; }
     header h1:hover { opacity: 0.85; }
     header span { font-size: 0.82rem; color: #8899bb; }
 
-    .container { max-width: 1060px; margin: 40px auto; padding: 0 24px; }
-
+    .container { max-width: 1060px; margin: 36px auto; padding: 0 24px; }
     .view { display: none; }
     .view.active { display: block; }
 
-    /* ── BUTTONS ── */
-    .btn-primary {
-      background: #4f46e5; color: white; border: none;
-      padding: 11px 22px; font-size: 0.93rem; font-weight: 600;
-      border-radius: 9px; cursor: pointer; transition: background 0.2s; white-space: nowrap;
-    }
+    /* BUTTONS */
+    .btn-primary { background: #4f46e5; color: white; border: none; padding: 11px 22px; font-size: 0.93rem; font-weight: 600; border-radius: 9px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
     .btn-primary:hover { background: #4338ca; }
     .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
-    .btn-secondary {
-      background: white; color: #374151; border: 1px solid #d1d5db;
-      padding: 10px 18px; font-size: 0.88rem; font-weight: 500;
-      border-radius: 9px; cursor: pointer; transition: background 0.2s;
-    }
+    .btn-success { background: #059669; color: white; border: none; padding: 11px 22px; font-size: 0.93rem; font-weight: 600; border-radius: 9px; cursor: pointer; transition: background 0.2s; }
+    .btn-success:hover { background: #047857; }
+    .btn-danger { background: #dc2626; color: white; border: none; padding: 11px 22px; font-size: 0.93rem; font-weight: 600; border-radius: 9px; cursor: pointer; transition: background 0.2s; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-secondary { background: white; color: #374151; border: 1px solid #d1d5db; padding: 10px 18px; font-size: 0.88rem; font-weight: 500; border-radius: 9px; cursor: pointer; transition: background 0.2s; }
     .btn-secondary:hover { background: #f9fafb; }
-    .btn-ghost {
-      background: none; border: none; color: #6b7280;
-      font-size: 0.85rem; cursor: pointer; padding: 4px 8px;
-      border-radius: 6px; transition: background 0.2s, color 0.2s;
-    }
+    .btn-ghost { background: none; border: none; color: #6b7280; font-size: 0.85rem; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.2s, color 0.2s; }
     .btn-ghost:hover { background: #f3f4f6; color: #374151; }
     .btn-ghost.danger:hover { background: #fee2e2; color: #dc2626; }
 
-    /* ── HOME ── */
-    .home-header {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 32px;
-    }
-    .home-header h2 { font-size: 1.6rem; font-weight: 700; }
-    .home-header p { color: #6b7280; font-size: 0.95rem; margin-top: 4px; }
+    /* CARDS */
+    .card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; }
+    .card h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; margin-bottom: 14px; }
 
-    .jobs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 18px;
-    }
-    .job-card {
-      background: white; border: 2px solid #e5e7eb;
-      border-radius: 14px; padding: 22px; cursor: pointer;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
+    /* VIEW HEADER */
+    .view-header { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; flex-wrap: wrap; }
+    .view-header h2 { font-size: 1.45rem; font-weight: 700; }
+
+    /* ── HOME ── */
+    .home-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .home-header h2 { font-size: 1.6rem; font-weight: 700; }
+    .home-header p { color: #6b7280; font-size: 0.93rem; margin-top: 4px; }
+    .jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+    .job-card { background: white; border: 2px solid #e5e7eb; border-radius: 14px; padding: 22px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
     .job-card:hover { border-color: #4f46e5; box-shadow: 0 4px 16px rgba(79,70,229,0.1); }
-    .job-card-top {
-      display: flex; align-items: flex-start;
-      justify-content: space-between; margin-bottom: 10px;
-    }
-    .job-card-icon {
-      width: 40px; height: 40px; background: #ede9fe;
-      border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-size: 1.2rem; flex-shrink: 0;
-    }
+    .job-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .job-card-icon { width: 40px; height: 40px; background: #ede9fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
     .job-card-actions { display: flex; gap: 4px; }
-    .job-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: #1a1a2e; }
+    .job-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: #1a1a2e; text-transform: none; letter-spacing: 0; }
     .job-card p { font-size: 0.82rem; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .job-card-footer {
-      margin-top: 16px; padding-top: 14px;
-      border-top: 1px solid #f3f4f6;
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    .job-card-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; }
     .job-card-date { font-size: 0.78rem; color: #9ca3af; }
-    .screen-from-card-btn {
-      background: #4f46e5; color: white; border: none;
-      padding: 7px 14px; font-size: 0.82rem; font-weight: 600;
-      border-radius: 7px; cursor: pointer; transition: background 0.2s;
-    }
-    .screen-from-card-btn:hover { background: #4338ca; }
+    .job-card-stats { display: flex; gap: 10px; margin-top: 10px; }
+    .stat-chip { font-size: 0.75rem; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
+    .stat-chip.green { background: #d1fae5; color: #065f46; }
+    .stat-chip.red { background: #fee2e2; color: #991b1b; }
+    .stat-chip.gray { background: #f3f4f6; color: #6b7280; }
     .empty-state { text-align: center; padding: 80px 20px; color: #9ca3af; grid-column: 1/-1; }
     .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; }
     .empty-state h3 { font-size: 1.2rem; color: #6b7280; margin-bottom: 8px; }
     .empty-state p { font-size: 0.9rem; margin-bottom: 24px; }
 
-    /* ── CREATE / EDIT ── */
-    .view-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
-    .view-header h2 { font-size: 1.5rem; font-weight: 700; }
+    /* ── CREATE/EDIT ── */
     .form-group { margin-bottom: 18px; }
     .form-group label { display: block; font-weight: 600; font-size: 0.88rem; color: #374151; margin-bottom: 7px; }
-    .form-group input[type="text"] {
-      width: 100%; padding: 11px 13px; border: 2px solid #e5e7eb;
-      border-radius: 9px; font-size: 0.93rem; font-family: inherit;
-      transition: border-color 0.2s;
-    }
+    .form-group input[type="text"] { width: 100%; padding: 11px 13px; border: 2px solid #e5e7eb; border-radius: 9px; font-size: 0.93rem; font-family: inherit; transition: border-color 0.2s; }
     .form-group input[type="text"]:focus { outline: none; border-color: #4f46e5; }
-    .form-group textarea {
-      width: 100%; padding: 13px; border: 2px solid #e5e7eb;
-      border-radius: 9px; font-size: 0.88rem; font-family: inherit;
-      resize: vertical; line-height: 1.6; transition: border-color 0.2s;
-    }
+    .form-group textarea { width: 100%; padding: 13px; border: 2px solid #e5e7eb; border-radius: 9px; font-size: 0.88rem; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.2s; }
     .form-group textarea:focus { outline: none; border-color: #4f46e5; }
     input::placeholder, textarea::placeholder { color: #9ca3af; }
     .form-actions { display: flex; gap: 12px; }
 
+    /* ── JOB DETAIL ── */
+    .job-detail-banner { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .job-detail-banner h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+    .job-detail-banner p { font-size: 0.85rem; color: #6b7280; line-height: 1.5; max-width: 600px; }
+    .detail-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+    .detail-stat { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 20px; text-align: center; min-width: 90px; }
+    .detail-stat .num { font-size: 1.5rem; font-weight: 800; }
+    .detail-stat .lbl { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
+
+    .candidates-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+    .candidates-section-header h3 { font-size: 1rem; font-weight: 700; }
+
+    .candidate-row { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.15s; flex-wrap: wrap; }
+    .candidate-row:hover { border-color: #4f46e5; box-shadow: 0 2px 8px rgba(79,70,229,0.08); }
+    .score-circle { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; flex-shrink: 0; }
+    .candidate-row-info { flex: 1; min-width: 120px; }
+    .candidate-row-info .cname { font-size: 0.95rem; font-weight: 700; }
+    .candidate-row-info .cdate { font-size: 0.78rem; color: #9ca3af; margin-top: 2px; }
+    .threshold-badge { font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 10px; }
+    .threshold-badge.pass { background: #d1fae5; color: #065f46; }
+    .threshold-badge.fail { background: #fee2e2; color: #991b1b; }
+    .status-badge { font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 10px; }
+    .status-badge.pending  { background: #f3f4f6; color: #6b7280; }
+    .status-badge.advanced { background: #d1fae5; color: #065f46; }
+    .status-badge.denied   { background: #fee2e2; color: #991b1b; }
+    .ai-badge { font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 10px; }
+    .ai-badge.advance { background: #ede9fe; color: #4c1d95; }
+    .ai-badge.reject  { background: #fef3c7; color: #92400e; }
+
     /* ── SCREEN VIEW ── */
-    .screen-job-banner {
-      background: #ede9fe; border: 1px solid #c4b5fd;
-      border-radius: 10px; padding: 13px 18px; margin-bottom: 20px;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    }
+    .screen-job-banner { background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 10px; padding: 13px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .screen-job-banner span { font-size: 0.9rem; color: #4c1d95; font-weight: 600; }
     .screen-job-banner small { font-size: 0.78rem; color: #7c3aed; }
-
-    /* Strictness slider */
-    .strictness-bar {
-      background: white; border: 1px solid #e5e7eb;
-      border-radius: 10px; padding: 14px 18px;
-      margin-bottom: 20px; display: flex;
-      align-items: center; gap: 16px; flex-wrap: wrap;
-    }
+    .strictness-bar { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 13px 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
     .strictness-bar label { font-size: 0.88rem; font-weight: 600; color: #374151; white-space: nowrap; }
     .strictness-options { display: flex; gap: 8px; }
-    .strictness-btn {
-      padding: 6px 16px; border-radius: 20px; font-size: 0.83rem;
-      font-weight: 600; border: 2px solid #e5e7eb;
-      background: white; cursor: pointer; transition: all 0.15s; color: #6b7280;
-    }
-    .strictness-btn.active-lenient { border-color: #10b981; background: #d1fae5; color: #065f46; }
+    .strictness-btn { padding: 6px 16px; border-radius: 20px; font-size: 0.83rem; font-weight: 600; border: 2px solid #e5e7eb; background: white; cursor: pointer; transition: all 0.15s; color: #6b7280; }
+    .strictness-btn.active-lenient  { border-color: #10b981; background: #d1fae5; color: #065f46; }
     .strictness-btn.active-balanced { border-color: #4f46e5; background: #ede9fe; color: #3730a3; }
-    .strictness-btn.active-strict { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
+    .strictness-btn.active-strict   { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
     .strictness-desc { font-size: 0.8rem; color: #9ca3af; }
-
-    /* Candidate entries */
-    .candidates-label {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px;
-    }
+    .candidates-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .candidates-label span { font-size: 0.88rem; font-weight: 600; color: #374151; }
-
-    .candidate-entry {
-      background: white; border: 1px solid #e5e7eb;
-      border-radius: 12px; padding: 16px; margin-bottom: 12px;
-    }
-    .candidate-entry-header {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 10px;
-    }
-    .candidate-num {
-      font-size: 0.82rem; font-weight: 700;
-      color: #4f46e5; background: #ede9fe;
-      padding: 3px 10px; border-radius: 12px;
-    }
-    .candidate-name-input {
-      flex: 1; margin: 0 12px;
-      padding: 7px 12px; border: 1px solid #e5e7eb;
-      border-radius: 7px; font-size: 0.85rem;
-      font-family: inherit; transition: border-color 0.2s;
-    }
+    .candidate-entry { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 10px; }
+    .candidate-entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .candidate-num { font-size: 0.82rem; font-weight: 700; color: #4f46e5; background: #ede9fe; padding: 3px 10px; border-radius: 12px; }
+    .candidate-name-input { flex: 1; margin: 0 12px; padding: 7px 12px; border: 1px solid #e5e7eb; border-radius: 7px; font-size: 0.85rem; font-family: inherit; transition: border-color 0.2s; }
     .candidate-name-input:focus { outline: none; border-color: #4f46e5; }
-    .candidate-entry textarea {
-      width: 100%; height: 180px; padding: 12px;
-      border: 1px solid #e5e7eb; border-radius: 8px;
-      font-size: 0.85rem; font-family: inherit;
-      resize: vertical; line-height: 1.6;
-      transition: border-color 0.2s;
-    }
+    .candidate-entry textarea { width: 100%; height: 180px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.85rem; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.2s; }
     .candidate-entry textarea:focus { outline: none; border-color: #4f46e5; }
-
-    .add-candidate-btn {
-      width: 100%; padding: 11px; border: 2px dashed #d1d5db;
-      border-radius: 10px; background: none; cursor: pointer;
-      font-size: 0.88rem; color: #9ca3af; transition: all 0.2s;
-      margin-bottom: 20px;
-    }
+    .add-candidate-btn { width: 100%; padding: 11px; border: 2px dashed #d1d5db; border-radius: 10px; background: none; cursor: pointer; font-size: 0.88rem; color: #9ca3af; transition: all 0.2s; margin-bottom: 20px; }
     .add-candidate-btn:hover { border-color: #4f46e5; color: #4f46e5; background: #fafafe; }
-
     .screen-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
 
     /* ── LOADING ── */
     #loading-view { text-align: center; padding: 80px 20px; color: #6b7280; }
-    .spinner {
-      width: 44px; height: 44px;
-      border: 4px solid #e5e7eb; border-top-color: #4f46e5;
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
+    .spinner { width: 44px; height: 44px; border: 4px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-progress { font-size: 0.85rem; color: #9ca3af; margin-top: 8px; }
 
-    /* ── SINGLE RESULTS ── */
-    .results-nav { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
-    .decision-banner {
-      border-radius: 14px; padding: 24px 28px; margin-bottom: 18px;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px;
-    }
-    .decision-banner.advance { background: #d1fae5; border: 2px solid #6ee7b7; }
-    .decision-banner.reject  { background: #fee2e2; border: 2px solid #fca5a5; }
-    .decision-label { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
-    .advance .decision-label { color: #065f46; }
-    .reject  .decision-label { color: #991b1b; }
-    .decision-meta { font-size: 0.93rem; color: #4b5563; max-width: 600px; }
-    .decision-meta strong { display: block; margin-bottom: 4px; }
-    .confidence-badge {
-      padding: 4px 12px; border-radius: 20px;
-      font-size: 0.8rem; font-weight: 600; background: white; opacity: 0.85;
-    }
-    .advance .confidence-badge { color: #065f46; }
-    .reject  .confidence-badge { color: #991b1b; }
+    /* ── CANDIDATE PROFILE ── */
+    .score-hero { background: white; border: 1px solid #e5e7eb; border-radius: 14px; padding: 28px; margin-bottom: 18px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .score-big-circle { width: 90px; height: 90px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+    .score-big-circle .big-num { font-size: 2rem; font-weight: 900; line-height: 1; }
+    .score-big-circle .big-lbl { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .score-hero-info { flex: 1; }
+    .score-hero-info h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+    .score-hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .threshold-big { font-size: 0.85rem; font-weight: 700; padding: 5px 14px; border-radius: 20px; }
+    .threshold-big.pass { background: #d1fae5; color: #065f46; }
+    .threshold-big.fail { background: #fee2e2; color: #991b1b; }
+    .score-hero-reason { font-size: 0.9rem; color: #6b7280; line-height: 1.5; }
 
-    .info-bar {
-      background: #eff6ff; border: 1px solid #bfdbfe;
-      border-radius: 10px; padding: 12px 16px;
-      font-size: 0.87rem; color: #1e40af; margin-bottom: 18px;
-    }
-    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    @media (max-width: 700px) { .results-grid { grid-template-columns: 1fr; } }
+    .decision-actions { display: flex; align-items: center; flex-direction: column; gap: 8px; flex-shrink: 0; }
+    .decision-actions label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; }
+    .decision-btns { display: flex; gap: 8px; }
+    .decision-btn { padding: 10px 18px; border: 2px solid transparent; border-radius: 9px; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .decision-btn.advance-btn { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+    .decision-btn.advance-btn:hover, .decision-btn.advance-btn.selected { background: #059669; color: white; border-color: #059669; }
+    .decision-btn.deny-btn { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+    .decision-btn.deny-btn:hover, .decision-btn.deny-btn.selected { background: #dc2626; color: white; border-color: #dc2626; }
+    .decision-btn.pending-btn { background: #f3f4f6; color: #6b7280; border-color: #e5e7eb; }
+    .decision-btn.pending-btn.selected { background: #6b7280; color: white; border-color: #6b7280; }
 
-    .card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; }
-    .card h3 {
-      font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.8px; color: #6b7280; margin-bottom: 14px;
-    }
+    .candidate-profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 700px) { .candidate-profile-grid { grid-template-columns: 1fr; } }
+
+    .pros-cons { list-style: none; }
+    .pros-cons li { padding: 6px 0; font-size: 0.88rem; color: #374151; border-bottom: 1px solid #f3f4f6; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+    .pros-cons li:last-child { border-bottom: none; }
+    .pros-cons .dot { margin-top: 6px; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .pro-dot  { background: #10b981; }
+    .con-dot  { background: #f59e0b; }
+
     .score-row { display: flex; align-items: center; margin-bottom: 10px; }
     .score-label { font-size: 0.86rem; color: #374151; width: 128px; }
     .score-bar-wrap { flex: 1; height: 8px; background: #f3f4f6; border-radius: 4px; margin: 0 10px; overflow: hidden; }
     .score-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
     .score-num { font-size: 0.86rem; font-weight: 600; width: 30px; text-align: right; }
-    .bullet-list { list-style: none; }
-    .bullet-list li {
-      padding: 5px 0; font-size: 0.88rem; color: #374151;
-      border-bottom: 1px solid #f3f4f6;
-      display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
-    }
-    .bullet-list li:last-child { border-bottom: none; }
-    .bullet-list .dot { margin-top: 6px; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .strengths .dot { background: #10b981; }
-    .gaps .dot     { background: #f59e0b; }
-    .summary-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; }
-    .summary-card h3 {
-      font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.8px; color: #6b7280; margin-bottom: 10px;
-    }
+
+    .summary-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; margin-bottom: 16px; }
+    .summary-card h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; margin-bottom: 10px; }
     .summary-card p { font-size: 0.92rem; line-height: 1.7; color: #374151; }
-    .copy-btn {
-      margin-top: 10px; background: #f3f4f6; border: 1px solid #e5e7eb;
-      padding: 7px 14px; border-radius: 7px; font-size: 0.82rem;
-      cursor: pointer; transition: background 0.2s; color: #374151;
-    }
+    .copy-btn { margin-top: 10px; background: #f3f4f6; border: 1px solid #e5e7eb; padding: 7px 14px; border-radius: 7px; font-size: 0.82rem; cursor: pointer; transition: background 0.2s; color: #374151; }
     .copy-btn:hover { background: #e5e7eb; }
 
-    /* ── BATCH RESULTS ── */
-    .batch-header {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
-    }
-    .batch-summary {
-      background: #eff6ff; border: 1px solid #bfdbfe;
-      border-radius: 10px; padding: 14px 18px;
-      display: flex; gap: 28px; flex-wrap: wrap; margin-bottom: 20px;
-    }
-    .batch-stat { text-align: center; }
-    .batch-stat .num { font-size: 1.6rem; font-weight: 800; color: #1e40af; }
-    .batch-stat .lbl { font-size: 0.78rem; color: #6b7280; margin-top: 2px; }
+    .resume-toggle { background: none; border: 1px solid #e5e7eb; padding: 8px 16px; border-radius: 8px; font-size: 0.83rem; cursor: pointer; color: #6b7280; margin-bottom: 10px; transition: background 0.2s; }
+    .resume-toggle:hover { background: #f3f4f6; }
+    .resume-text { display: none; background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; font-size: 0.82rem; line-height: 1.7; color: #6b7280; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
 
+    /* ── BATCH RESULTS ── */
+    .batch-summary-bar { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 18px; display: flex; gap: 28px; flex-wrap: wrap; margin-bottom: 20px; }
+    .batch-stat { text-align: center; }
+    .batch-stat .num { font-size: 1.5rem; font-weight: 800; color: #1e40af; }
+    .batch-stat .lbl { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
     .rank-table { width: 100%; border-collapse: collapse; }
-    .rank-table th {
-      text-align: left; font-size: 0.78rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.6px;
-      color: #9ca3af; padding: 10px 12px;
-      border-bottom: 2px solid #f3f4f6;
-    }
+    .rank-table th { text-align: left; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #9ca3af; padding: 10px 12px; border-bottom: 2px solid #f3f4f6; }
     .rank-table td { padding: 12px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
     .rank-table tr:last-child td { border-bottom: none; }
-    .rank-table tr:hover td { background: #fafafa; }
-
-    .rank-num { font-size: 1.1rem; font-weight: 800; color: #d1d5db; width: 36px; }
-    .rank-num.gold   { color: #f59e0b; }
+    .rank-table tbody tr:hover td { background: #fafafa; cursor: pointer; }
+    .rank-num { font-size: 1.1rem; font-weight: 800; color: #d1d5db; }
+    .rank-num.gold { color: #f59e0b; }
     .rank-num.silver { color: #9ca3af; }
     .rank-num.bronze { color: #cd7c54; }
-
-    .decision-pill {
-      display: inline-block; padding: 3px 10px; border-radius: 12px;
-      font-size: 0.78rem; font-weight: 700;
-    }
+    .decision-pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; }
     .decision-pill.advance { background: #d1fae5; color: #065f46; }
     .decision-pill.reject  { background: #fee2e2; color: #991b1b; }
-
-    .mini-bar-wrap { width: 80px; height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
+    .mini-bar-wrap { width: 70px; height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
     .mini-bar { height: 100%; border-radius: 3px; }
 
-    .expand-btn {
-      background: none; border: 1px solid #e5e7eb;
-      padding: 4px 10px; border-radius: 6px;
-      font-size: 0.78rem; cursor: pointer; color: #6b7280;
-      transition: all 0.15s;
-    }
-    .expand-btn:hover { background: #f3f4f6; }
-
-    .detail-row td { padding: 0 !important; }
-    .detail-panel {
-      display: none; padding: 16px 20px;
-      background: #fafafa; border-top: 1px solid #f3f4f6;
-    }
-    .detail-panel.open { display: block; }
-    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
-
-    .error-box {
-      background: #fee2e2; border: 1px solid #fca5a5;
-      border-radius: 10px; padding: 13px 16px;
-      color: #991b1b; font-size: 0.9rem;
-      display: none; margin-top: 12px;
-    }
+    .error-box { background: #fee2e2; border: 1px solid #fca5a5; border-radius: 10px; padding: 13px 16px; color: #991b1b; font-size: 0.9rem; display: none; margin-top: 12px; }
+    .info-bar { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; font-size: 0.87rem; color: #1e40af; margin-bottom: 16px; }
   </style>
 </head>
 <body>
@@ -345,10 +219,7 @@
   <!-- HOME -->
   <div id="home-view" class="view active">
     <div class="home-header">
-      <div>
-        <h2>Job Profiles</h2>
-        <p>Select a role to screen candidates, or create a new profile.</p>
-      </div>
+      <div><h2>Job Profiles</h2><p>Select a role to screen candidates or review past results.</p></div>
       <button class="btn-primary" onclick="showCreate()">+ New Job Profile</button>
     </div>
     <div id="jobs-grid" class="jobs-grid"></div>
@@ -357,7 +228,7 @@
   <!-- CREATE / EDIT -->
   <div id="create-view" class="view">
     <div class="view-header">
-      <button class="btn-secondary" onclick="showHome()">← Back</button>
+      <button class="btn-secondary" onclick="goBackFromCreate()">← Back</button>
       <h2 id="create-view-title">New Job Profile</h2>
     </div>
     <div class="form-group">
@@ -370,46 +241,57 @@
     </div>
     <div class="form-actions">
       <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
-      <button class="btn-secondary" onclick="showHome()">Cancel</button>
+      <button class="btn-secondary" onclick="goBackFromCreate()">Cancel</button>
     </div>
     <div class="error-box" id="create-error"></div>
+  </div>
+
+  <!-- JOB DETAIL -->
+  <div id="job-detail-view" class="view">
+    <div class="view-header">
+      <button class="btn-secondary" onclick="showHome()">← All Jobs</button>
+      <h2 id="job-detail-title"></h2>
+      <button class="btn-ghost" onclick="showCreate(currentProfileId)" style="margin-left:auto;">✏️ Edit</button>
+    </div>
+    <div class="job-detail-banner">
+      <div>
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin-bottom:6px;">Job Description</div>
+        <p id="job-detail-jd-preview"></p>
+      </div>
+    </div>
+    <div class="detail-stats" id="job-detail-stats"></div>
+    <div class="candidates-section-header">
+      <h3 id="candidates-section-title">Candidates</h3>
+      <button class="btn-primary" onclick="showScreen(currentProfileId)">+ Screen New Candidate</button>
+    </div>
+    <div id="candidates-list-view"></div>
   </div>
 
   <!-- SCREEN -->
   <div id="screen-view" class="view">
     <div class="view-header">
-      <button class="btn-secondary" onclick="showHome()">← Back to Jobs</button>
+      <button class="btn-secondary" onclick="showJobDetail(currentProfileId)">← Back</button>
       <h2 id="screen-view-title">Screen Candidates</h2>
     </div>
-
-    <!-- Job banner -->
     <div class="screen-job-banner">
-      <div>
-        <span id="screen-job-name"></span><br/>
-        <small>Job description loaded from saved profile</small>
-      </div>
-      <button class="btn-ghost" onclick="editCurrentProfile()">✏️ Edit Profile</button>
+      <div><span id="screen-job-name"></span><br/><small>Job description loaded from saved profile</small></div>
+      <button class="btn-ghost" onclick="showCreate(currentProfileId)">✏️ Edit Profile</button>
     </div>
-
-    <!-- Strictness -->
     <div class="strictness-bar">
       <label>Screening Strictness:</label>
       <div class="strictness-options">
-        <button class="strictness-btn active-lenient" id="s-1" onclick="setStrictness(1)">Lenient</button>
-        <button class="strictness-btn active-balanced" id="s-2" onclick="setStrictness(2)">Balanced</button>
-        <button class="strictness-btn active-strict"  id="s-3" onclick="setStrictness(3)">Strict</button>
+        <button class="strictness-btn" id="s-1" onclick="setStrictness(1)">Lenient</button>
+        <button class="strictness-btn" id="s-2" onclick="setStrictness(2)">Balanced</button>
+        <button class="strictness-btn" id="s-3" onclick="setStrictness(3)">Strict</button>
       </div>
-      <span class="strictness-desc" id="strictness-desc">Advance if meets ~75% of requirements</span>
+      <span class="strictness-desc" id="strictness-desc"></span>
     </div>
-
-    <!-- Candidate entries -->
     <div class="candidates-label">
       <span>Candidates to Screen</span>
       <span id="candidate-count-label" style="font-size:0.8rem;color:#9ca3af;"></span>
     </div>
-    <div id="candidates-list"></div>
-    <button class="add-candidate-btn" onclick="addCandidate()">+ Add Another Candidate</button>
-
+    <div id="candidates-input-list"></div>
+    <button class="add-candidate-btn" onclick="addCandidateInput()">+ Add Another Candidate</button>
     <div class="screen-actions">
       <button class="btn-primary" style="padding:13px 40px;font-size:1rem;" onclick="runScreening()">
         <span id="screen-btn-label">Screen Candidate</span>
@@ -425,67 +307,81 @@
     <p class="loading-progress" id="loading-progress"></p>
   </div>
 
-  <!-- SINGLE RESULT -->
-  <div id="results-view" class="view">
-    <div class="results-nav">
-      <button class="btn-secondary" onclick="backToScreen()">← Screen Another</button>
-      <button class="btn-secondary" onclick="showHome()">All Job Profiles</button>
-      <button class="btn-primary" style="margin-left:auto;" onclick="exportSingleCSV()">Export CSV</button>
+  <!-- CANDIDATE PROFILE -->
+  <div id="candidate-view" class="view">
+    <div class="view-header">
+      <button class="btn-secondary" id="candidate-back-btn" onclick="showJobDetail(currentProfileId)">← Back to Job</button>
+      <button class="btn-secondary" style="margin-left:auto;" onclick="exportCandidateCSV()">⬇ Export CSV</button>
     </div>
-    <div class="decision-banner" id="decision-banner">
-      <div>
-        <div class="decision-label" id="decision-label"></div>
-        <div class="decision-meta"><strong id="decision-reason"></strong></div>
+
+    <div class="score-hero">
+      <div class="score-big-circle" id="score-big-circle">
+        <span class="big-num" id="score-big-num"></span>
+        <span class="big-lbl">/ 100</span>
       </div>
-      <div class="confidence-badge" id="confidence-badge"></div>
+      <div class="score-hero-info">
+        <h2 id="candidate-profile-name"></h2>
+        <div class="score-hero-badges">
+          <span class="threshold-big" id="threshold-big-badge"></span>
+          <span class="ai-badge" id="ai-rec-badge"></span>
+          <span class="status-badge" id="candidate-status-badge"></span>
+        </div>
+        <p class="score-hero-reason" id="candidate-decision-reason"></p>
+        <div style="font-size:0.75rem;color:#9ca3af;margin-top:6px;" id="candidate-screened-at"></div>
+      </div>
+      <div class="decision-actions">
+        <label>Your Decision</label>
+        <div class="decision-btns">
+          <button class="decision-btn advance-btn" id="btn-advance" onclick="setDecision('advanced')">✓ Advance</button>
+          <button class="decision-btn deny-btn"    id="btn-deny"    onclick="setDecision('denied')">✗ Deny</button>
+        </div>
+        <button class="decision-btn pending-btn" id="btn-pending" onclick="setDecision('pending')" style="width:100%;">Reset to Pending</button>
+      </div>
     </div>
-    <div class="info-bar" id="time-saved-bar"></div>
-    <div class="results-grid">
+
+    <div class="candidate-profile-grid">
       <div class="card">
         <h3>Category Scores</h3>
-        <div id="scores-container"></div>
+        <div id="candidate-scores-container"></div>
       </div>
       <div class="card">
-        <h3>Strengths &amp; Gaps</h3>
-        <ul class="bullet-list strengths" id="strengths-list"></ul>
+        <h3>Pros &amp; Cons</h3>
+        <ul class="pros-cons" id="candidate-pros"></ul>
         <div style="height:1px;background:#f3f4f6;margin:10px 0;"></div>
-        <ul class="bullet-list gaps" id="gaps-list"></ul>
+        <ul class="pros-cons" id="candidate-cons"></ul>
       </div>
     </div>
+
     <div class="summary-card">
-      <h3>Recruiter Summary</h3>
-      <p id="summary-text"></p>
-      <button class="copy-btn" onclick="copySummary()">Copy to Clipboard</button>
+      <h3>Comprehensive Summary</h3>
+      <p id="candidate-summary"></p>
+      <button class="copy-btn" onclick="copyCandidateSummary()">Copy to Clipboard</button>
+    </div>
+
+    <div class="card">
+      <h3>Resume</h3>
+      <button class="resume-toggle" onclick="toggleResume()">Show Resume Text</button>
+      <div class="resume-text" id="resume-text-display"></div>
     </div>
   </div>
 
   <!-- BATCH RESULTS -->
   <div id="batch-results-view" class="view">
-    <div class="batch-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <button class="btn-secondary" onclick="backToScreen()">← Screen More</button>
-        <button class="btn-secondary" onclick="showHome()">All Job Profiles</button>
+        <button class="btn-secondary" onclick="showScreen(currentProfileId)">← Screen More</button>
+        <button class="btn-secondary" onclick="showJobDetail(currentProfileId)">View Job Profile</button>
       </div>
       <button class="btn-primary" onclick="exportBatchCSV()">⬇ Export to CSV</button>
     </div>
-
-    <div class="batch-summary" id="batch-summary"></div>
-
+    <div class="batch-summary-bar" id="batch-summary"></div>
     <div class="card">
-      <h3>Ranked Candidates</h3>
+      <h3>Ranked Candidates — click any row to view full profile</h3>
       <table class="rank-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Candidate</th>
-            <th>Decision</th>
-            <th>Overall</th>
-            <th>Skills</th>
-            <th>Experience</th>
-            <th>Education</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>#</th><th>Candidate</th><th>Score</th><th>Threshold</th>
+          <th>AI Rec</th><th>Skills</th><th>Experience</th><th>Education</th>
+        </tr></thead>
         <tbody id="rank-tbody"></tbody>
       </table>
     </div>
@@ -495,13 +391,13 @@
 
 <script>
   // ── STATE ──────────────────────────────────────────────
+  const THRESHOLD = 75;
   let currentProfileId = null;
+  let currentCandidateId = null;
   let editingProfileId = null;
   let currentStrictness = 2;
-  let candidateCount = 0;
-  let lastSingleResult = null;
-  let lastBatchResults = [];
-  let lastJobName = '';
+  let candidateInputCount = 0;
+  let lastBatchCandidateIds = [];
 
   const STRICTNESS_DESC = {
     1: 'Advance if meets ~60% of requirements',
@@ -509,30 +405,57 @@
     3: 'Advance only if meets 85%+ of requirements',
   };
 
-  // ── PROFILES ──────────────────────────────────────────
-  function getProfiles() {
-    return JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+  // ── STORAGE ───────────────────────────────────────────
+  function getProfiles() { return JSON.parse(localStorage.getItem('jobProfiles') || '[]'); }
+  function saveProfiles(p) { localStorage.setItem('jobProfiles', JSON.stringify(p)); }
+
+  function getProfile(id) { return getProfiles().find(p => p.id === id); }
+
+  function saveCandidate(profileId, candidateData) {
+    const profiles = getProfiles();
+    const idx = profiles.findIndex(p => p.id === profileId);
+    if (idx === -1) return null;
+    if (!profiles[idx].candidates) profiles[idx].candidates = [];
+    const candidate = {
+      id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
+      status: 'pending',
+      screenedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      ...candidateData,
+    };
+    profiles[idx].candidates.unshift(candidate);
+    saveProfiles(profiles);
+    return candidate.id;
   }
-  function saveProfiles(p) {
-    localStorage.setItem('jobProfiles', JSON.stringify(p));
+
+  function updateCandidateStatus(profileId, candidateId, status) {
+    const profiles = getProfiles();
+    const pIdx = profiles.findIndex(p => p.id === profileId);
+    if (pIdx === -1) return;
+    const cIdx = (profiles[pIdx].candidates || []).findIndex(c => c.id === candidateId);
+    if (cIdx === -1) return;
+    profiles[pIdx].candidates[cIdx].status = status;
+    saveProfiles(profiles);
+  }
+
+  function getCandidate(profileId, candidateId) {
+    const profile = getProfile(profileId);
+    return (profile?.candidates || []).find(c => c.id === candidateId);
   }
 
   // ── VIEWS ─────────────────────────────────────────────
   function showView(id) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
   }
 
-  function showHome() {
-    renderJobCards();
-    showView('home-view');
-  }
+  function showHome() { renderJobCards(); showView('home-view'); }
 
   function showCreate(profileId = null) {
     editingProfileId = profileId;
     document.getElementById('create-error').style.display = 'none';
     if (profileId) {
-      const p = getProfiles().find(p => p.id === profileId);
+      const p = getProfile(profileId);
       document.getElementById('create-view-title').textContent = 'Edit Job Profile';
       document.getElementById('profile-name').value = p.name;
       document.getElementById('profile-jd').value = p.jobDescription;
@@ -544,114 +467,309 @@
     showView('create-view');
   }
 
-  function showScreen(profileId) {
-    const p = getProfiles().find(p => p.id === profileId);
-    if (!p) return;
+  function goBackFromCreate() {
+    if (editingProfileId) showJobDetail(editingProfileId);
+    else showHome();
+  }
+
+  function showJobDetail(profileId) {
     currentProfileId = profileId;
-    lastJobName = p.name;
+    const p = getProfile(profileId);
+    if (!p) return showHome();
+
+    document.getElementById('job-detail-title').textContent = p.name;
+    document.getElementById('job-detail-jd-preview').textContent =
+      p.jobDescription.length > 200 ? p.jobDescription.substring(0, 200) + '…' : p.jobDescription;
+
+    const candidates = p.candidates || [];
+    const passed = candidates.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
+    const advanced = candidates.filter(c => c.status === 'advanced').length;
+    const denied = candidates.filter(c => c.status === 'denied').length;
+
+    document.getElementById('job-detail-stats').innerHTML = `
+      <div class="detail-stat"><div class="num">${candidates.length}</div><div class="lbl">Screened</div></div>
+      <div class="detail-stat"><div class="num" style="color:#1e40af">${passed}</div><div class="lbl">Passed (≥${THRESHOLD})</div></div>
+      <div class="detail-stat"><div class="num" style="color:#065f46">${advanced}</div><div class="lbl">Advanced</div></div>
+      <div class="detail-stat"><div class="num" style="color:#991b1b">${denied}</div><div class="lbl">Denied</div></div>`;
+
+    document.getElementById('candidates-section-title').textContent =
+      candidates.length ? `${candidates.length} Candidate${candidates.length !== 1 ? 's' : ''}` : 'No candidates yet';
+
+    const listEl = document.getElementById('candidates-list-view');
+    if (!candidates.length) {
+      listEl.innerHTML = `<div style="text-align:center;padding:40px;color:#9ca3af;font-size:0.9rem;">
+        No candidates screened yet. Click "Screen New Candidate" to get started.</div>`;
+    } else {
+      listEl.innerHTML = candidates.map(c => {
+        const score = c.resume_score || 0;
+        const passes = score >= THRESHOLD;
+        const color = scoreColor(score);
+        return `<div class="candidate-row" onclick="showCandidateProfile('${c.id}')">
+          <div class="score-circle" style="background:${color}18;color:${color};">${score}</div>
+          <div class="candidate-row-info">
+            <div class="cname">${esc(c.name || 'Unnamed Candidate')}</div>
+            <div class="cdate">${c.screenedAt}</div>
+          </div>
+          <span class="threshold-badge ${passes ? 'pass' : 'fail'}">${passes ? '✓ Passes' : '✗ Below'} ${THRESHOLD}</span>
+          <span class="ai-badge ${c.decision === 'ADVANCE' ? 'advance' : 'reject'}">AI: ${c.decision}</span>
+          <span class="status-badge ${c.status}">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
+          <span style="color:#9ca3af;font-size:1.1rem;margin-left:auto;">›</span>
+        </div>`;
+      }).join('');
+    }
+
+    showView('job-detail-view');
+  }
+
+  function showScreen(profileId) {
+    currentProfileId = profileId;
+    const p = getProfile(profileId);
     document.getElementById('screen-view-title').textContent = `Screen — ${p.name}`;
     document.getElementById('screen-job-name').textContent = p.name;
     document.getElementById('screen-error').style.display = 'none';
     setStrictness(2);
-    resetCandidates();
+    resetCandidateInputs();
     showView('screen-view');
   }
 
-  function editCurrentProfile() { showCreate(currentProfileId); }
+  function showCandidateProfile(candidateId) {
+    currentCandidateId = candidateId;
+    const c = getCandidate(currentProfileId, candidateId);
+    if (!c) return;
 
-  function backToScreen() { showScreen(currentProfileId); }
+    const score = c.resume_score || 0;
+    const passes = score >= THRESHOLD;
+    const color = scoreColor(score);
+
+    const circle = document.getElementById('score-big-circle');
+    circle.style.background = `${color}18`;
+    circle.style.color = color;
+    circle.style.border = `3px solid ${color}`;
+    document.getElementById('score-big-num').textContent = score;
+
+    document.getElementById('candidate-profile-name').textContent = c.name || 'Unnamed Candidate';
+    document.getElementById('threshold-big-badge').textContent = passes ? `✓ Passes Threshold (${THRESHOLD}+)` : `✗ Below Threshold (${THRESHOLD})`;
+    document.getElementById('threshold-big-badge').className = `threshold-big ${passes ? 'pass' : 'fail'}`;
+    document.getElementById('ai-rec-badge').textContent = `AI: ${c.decision}`;
+    document.getElementById('ai-rec-badge').className = `ai-badge ${c.decision === 'ADVANCE' ? 'advance' : 'reject'}`;
+    document.getElementById('candidate-decision-reason').textContent = c.decision_reason || '';
+    document.getElementById('candidate-screened-at').textContent = `Screened ${c.screenedAt} · ${c.confidence} confidence · ${c.screening_time_seconds}s`;
+
+    updateDecisionUI(c.status);
+
+    const scoreLabels = { skills_match: 'Skills Match', experience_level: 'Experience', education_fit: 'Education Fit', overall_fit: 'Overall Fit' };
+    const sc = document.getElementById('candidate-scores-container');
+    sc.innerHTML = '';
+    for (const [key, label] of Object.entries(scoreLabels)) {
+      const val = c.scores?.[key] ?? 0;
+      const col = scoreColor(val);
+      sc.innerHTML += `<div class="score-row">
+        <span class="score-label">${label}</span>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${val}%;background:${col};"></div></div>
+        <span class="score-num" style="color:${col}">${val}</span></div>`;
+    }
+
+    document.getElementById('candidate-pros').innerHTML =
+      (c.strengths || []).map(s => `<li><span class="dot pro-dot"></span>${esc(s)}</li>`).join('');
+    document.getElementById('candidate-cons').innerHTML =
+      (c.gaps || []).map(g => `<li><span class="dot con-dot"></span>${esc(g)}</li>`).join('');
+
+    document.getElementById('candidate-summary').textContent = c.summary || '';
+    document.getElementById('resume-text-display').textContent = c.resume || '';
+    document.getElementById('resume-text-display').style.display = 'none';
+    document.querySelector('.resume-toggle').textContent = 'Show Resume Text';
+
+    showView('candidate-view');
+  }
+
+  // ── DECISIONS ─────────────────────────────────────────
+  function setDecision(status) {
+    updateCandidateStatus(currentProfileId, currentCandidateId, status);
+    updateDecisionUI(status);
+  }
+
+  function updateDecisionUI(status) {
+    document.getElementById('candidate-status-badge').textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    document.getElementById('candidate-status-badge').className = `status-badge ${status}`;
+    ['advance', 'deny', 'pending'].forEach(t => {
+      document.getElementById(`btn-${t}`).classList.remove('selected');
+    });
+    if (status === 'advanced') document.getElementById('btn-advance').classList.add('selected');
+    if (status === 'denied')   document.getElementById('btn-deny').classList.add('selected');
+    if (status === 'pending')  document.getElementById('btn-pending').classList.add('selected');
+  }
+
+  // ── CREATE/SAVE PROFILE ───────────────────────────────
+  function saveProfile() {
+    const name = document.getElementById('profile-name').value.trim();
+    const jd = document.getElementById('profile-jd').value.trim();
+    const errBox = document.getElementById('create-error');
+    if (!name || !jd) {
+      errBox.textContent = 'Please fill in both the role title and job description.';
+      errBox.style.display = 'block';
+      return;
+    }
+    const profiles = getProfiles();
+    if (editingProfileId) {
+      const idx = profiles.findIndex(p => p.id === editingProfileId);
+      if (idx !== -1) { profiles[idx].name = name; profiles[idx].jobDescription = jd; }
+      saveProfiles(profiles);
+      showJobDetail(editingProfileId);
+    } else {
+      profiles.push({
+        id: Date.now().toString(), name, jobDescription: jd, candidates: [],
+        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      });
+      saveProfiles(profiles);
+      showHome();
+    }
+  }
+
+  function deleteProfile(id, e) {
+    e.stopPropagation();
+    if (!confirm('Delete this job profile and all its candidates?')) return;
+    saveProfiles(getProfiles().filter(p => p.id !== id));
+    renderJobCards();
+  }
+
+  function renderJobCards() {
+    const profiles = getProfiles();
+    const grid = document.getElementById('jobs-grid');
+    if (!profiles.length) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div>
+        <h3>No job profiles yet</h3><p>Create your first profile to start screening.</p>
+        <button class="btn-primary" onclick="showCreate()">+ Create First Profile</button></div>`;
+      return;
+    }
+    grid.innerHTML = profiles.map(p => {
+      const candidates = p.candidates || [];
+      const passed = candidates.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
+      const advanced = candidates.filter(c => c.status === 'advanced').length;
+      return `<div class="job-card" onclick="showJobDetail('${p.id}')">
+        <div class="job-card-top">
+          <div class="job-card-icon">💼</div>
+          <div class="job-card-actions">
+            <button class="btn-ghost" title="Edit" onclick="showCreate('${p.id}');event.stopPropagation()">✏️</button>
+            <button class="btn-ghost danger" title="Delete" onclick="deleteProfile('${p.id}',event)">🗑️</button>
+          </div>
+        </div>
+        <h3>${esc(p.name)}</h3>
+        <p>${esc(p.jobDescription.substring(0, 90))}...</p>
+        <div class="job-card-stats">
+          <span class="stat-chip gray">${candidates.length} screened</span>
+          ${passed  ? `<span class="stat-chip green">${passed} passed</span>` : ''}
+          ${advanced ? `<span class="stat-chip green">${advanced} advanced</span>` : ''}
+        </div>
+        <div class="job-card-footer">
+          <span class="job-card-date">${p.createdAt}</span>
+          <button class="screen-from-card-btn" onclick="showScreen('${p.id}');event.stopPropagation()">Screen →</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
 
   // ── STRICTNESS ────────────────────────────────────────
   function setStrictness(val) {
     currentStrictness = val;
     [1, 2, 3].forEach(n => {
       const btn = document.getElementById(`s-${n}`);
-      btn.style.fontWeight = n === val ? '700' : '500';
-      btn.style.opacity = n === val ? '1' : '0.45';
+      const classes = { 1: 'active-lenient', 2: 'active-balanced', 3: 'active-strict' };
+      btn.className = 'strictness-btn' + (n === val ? ` ${classes[n]}` : '');
     });
     document.getElementById('strictness-desc').textContent = STRICTNESS_DESC[val];
   }
 
-  // ── CANDIDATES ────────────────────────────────────────
-  function resetCandidates() {
-    candidateCount = 0;
-    document.getElementById('candidates-list').innerHTML = '';
-    addCandidate();
+  // ── CANDIDATE INPUTS ──────────────────────────────────
+  function resetCandidateInputs() {
+    candidateInputCount = 0;
+    document.getElementById('candidates-input-list').innerHTML = '';
+    addCandidateInput();
     updateScreenBtn();
   }
 
-  function addCandidate() {
-    candidateCount++;
-    const id = candidateCount;
-    const list = document.getElementById('candidates-list');
+  function addCandidateInput() {
+    candidateInputCount++;
+    const id = candidateInputCount;
+    const list = document.getElementById('candidates-input-list');
     const el = document.createElement('div');
     el.className = 'candidate-entry';
-    el.id = `candidate-${id}`;
+    el.id = `cinput-${id}`;
     el.innerHTML = `
       <div class="candidate-entry-header">
         <span class="candidate-num">Candidate ${id}</span>
         <input class="candidate-name-input" type="text" placeholder="Name or label (optional)" id="cname-${id}" />
-        ${id > 1 ? `<button class="btn-ghost danger" onclick="removeCandidate(${id})">✕</button>` : ''}
+        ${id > 1 ? `<button class="btn-ghost danger" onclick="removeCandidateInput(${id})">✕</button>` : ''}
       </div>
       <textarea id="cresume-${id}" placeholder="Paste resume text here..."></textarea>`;
     list.appendChild(el);
     updateScreenBtn();
   }
 
-  function removeCandidate(id) {
-    document.getElementById(`candidate-${id}`).remove();
+  function removeCandidateInput(id) {
+    document.getElementById(`cinput-${id}`).remove();
     updateScreenBtn();
   }
 
   function updateScreenBtn() {
-    const entries = document.querySelectorAll('.candidate-entry');
-    const count = entries.length;
+    const count = document.querySelectorAll('.candidate-entry').length;
     document.getElementById('screen-btn-label').textContent =
       count === 1 ? 'Screen Candidate' : `Screen All ${count} Candidates`;
     document.getElementById('candidate-count-label').textContent =
-      count === 1 ? '' : `${count} candidates queued`;
+      count > 1 ? `${count} candidates queued` : '';
   }
 
-  function getCandidateEntries() {
-    const results = [];
-    document.querySelectorAll('.candidate-entry').forEach(el => {
-      const id = el.id.replace('candidate-', '');
-      const name = document.getElementById(`cname-${id}`)?.value.trim() || '';
-      const resume = document.getElementById(`cresume-${id}`)?.value.trim() || '';
-      results.push({ name, resume });
+  function getCandidateInputs() {
+    return Array.from(document.querySelectorAll('.candidate-entry')).map(el => {
+      const id = el.id.replace('cinput-', '');
+      return {
+        name: document.getElementById(`cname-${id}`)?.value.trim() || '',
+        resume: document.getElementById(`cresume-${id}`)?.value.trim() || '',
+      };
     });
-    return results;
   }
 
   // ── SCREENING ─────────────────────────────────────────
   async function runScreening() {
-    const entries = getCandidateEntries();
+    const inputs = getCandidateInputs();
+    const valid = inputs.filter(e => e.resume);
     const errBox = document.getElementById('screen-error');
-    const jd = getProfiles().find(p => p.id === currentProfileId)?.jobDescription || '';
     errBox.style.display = 'none';
 
-    const valid = entries.filter(e => e.resume);
-    if (valid.length === 0) {
+    if (!valid.length) {
       errBox.textContent = 'Please paste at least one resume before screening.';
       errBox.style.display = 'block';
       return;
     }
 
+    const jd = getProfile(currentProfileId)?.jobDescription || '';
+
     if (valid.length === 1) {
-      await screenSingle(jd, valid[0]);
+      await doScreenSingle(jd, valid[0]);
     } else {
-      await screenBatch(jd, valid);
+      await doScreenBatch(jd, valid);
     }
   }
 
-  async function screenSingle(jd, candidate) {
+  async function doScreenSingle(jd, input) {
     showView('loading-view');
     document.getElementById('loading-progress').textContent = '';
     try {
-      const data = await callScreen(jd, candidate.resume);
-      data.candidateName = candidate.name || 'Candidate';
-      lastSingleResult = data;
-      renderSingleResult(data);
+      const data = await callScreen(jd, input.resume);
+      const cid = saveCandidate(currentProfileId, {
+        name: input.name || 'Unnamed Candidate',
+        resume: input.resume,
+        resume_score: data.resume_score || data.scores?.overall_fit || 0,
+        decision: data.decision,
+        confidence: data.confidence,
+        summary: data.summary,
+        scores: data.scores,
+        strengths: data.strengths,
+        gaps: data.gaps,
+        decision_reason: data.decision_reason,
+        screening_time_seconds: data.screening_time_seconds,
+      });
+      currentCandidateId = cid;
+      showCandidateProfile(cid);
     } catch (err) {
       showView('screen-view');
       const errBox = document.getElementById('screen-error');
@@ -660,27 +778,35 @@
     }
   }
 
-  async function screenBatch(jd, candidates) {
+  async function doScreenBatch(jd, inputs) {
     showView('loading-view');
-    lastBatchResults = [];
+    lastBatchCandidateIds = [];
 
-    for (let i = 0; i < candidates.length; i++) {
-      document.getElementById('loading-progress').textContent =
-        `Screening candidate ${i + 1} of ${candidates.length}...`;
+    for (let i = 0; i < inputs.length; i++) {
+      document.getElementById('loading-progress').textContent = `Screening candidate ${i + 1} of ${inputs.length}...`;
       try {
-        const data = await callScreen(jd, candidates[i].resume);
-        data.candidateName = candidates[i].name || `Candidate ${i + 1}`;
-        lastBatchResults.push(data);
+        const data = await callScreen(jd, inputs[i].resume);
+        const cid = saveCandidate(currentProfileId, {
+          name: inputs[i].name || `Candidate ${i + 1}`,
+          resume: inputs[i].resume,
+          resume_score: data.resume_score || data.scores?.overall_fit || 0,
+          decision: data.decision,
+          confidence: data.confidence,
+          summary: data.summary,
+          scores: data.scores,
+          strengths: data.strengths,
+          gaps: data.gaps,
+          decision_reason: data.decision_reason,
+          screening_time_seconds: data.screening_time_seconds,
+        });
+        lastBatchCandidateIds.push(cid);
       } catch (err) {
         showView('screen-view');
-        const errBox = document.getElementById('screen-error');
-        errBox.textContent = `Error on candidate ${i + 1}: ${err.message}`;
-        errBox.style.display = 'block';
+        document.getElementById('screen-error').textContent = `Error on candidate ${i + 1}: ${err.message}`;
+        document.getElementById('screen-error').style.display = 'block';
         return;
       }
     }
-
-    lastBatchResults.sort((a, b) => (b.scores?.overall_fit ?? 0) - (a.scores?.overall_fit ?? 0));
     renderBatchResults();
   }
 
@@ -695,213 +821,92 @@
     return data;
   }
 
-  // ── RENDER SINGLE ─────────────────────────────────────
-  function renderSingleResult(data) {
-    const isAdvance = data.decision === 'ADVANCE';
-    const banner = document.getElementById('decision-banner');
-    banner.className = 'decision-banner ' + (isAdvance ? 'advance' : 'reject');
-    document.getElementById('decision-label').textContent = isAdvance ? '✓ Advance' : '✗ Reject';
-    document.getElementById('decision-reason').textContent = data.decision_reason;
-    document.getElementById('confidence-badge').textContent = data.confidence + ' Confidence';
-
-    const t = parseFloat(data.screening_time_seconds);
-    const savedSec = Math.max(0, 180 - t);
-    document.getElementById('time-saved-bar').innerHTML =
-      `⚡ Completed in <strong>${t}s</strong> &nbsp;·&nbsp; Saved ~<strong>${Math.floor(savedSec / 60)}m ${Math.round(savedSec % 60)}s</strong> vs manual &nbsp;·&nbsp; At 200 applicants: <strong>${Math.round(savedSec * 200 / 3600)} hours saved</strong>`;
-
-    const scoreLabels = { skills_match:'Skills Match', experience_level:'Experience', education_fit:'Education Fit', overall_fit:'Overall Fit' };
-    const sc = document.getElementById('scores-container');
-    sc.innerHTML = '';
-    for (const [key, label] of Object.entries(scoreLabels)) {
-      const val = data.scores?.[key] ?? 0;
-      const color = scoreColor(val);
-      sc.innerHTML += `<div class="score-row">
-        <span class="score-label">${label}</span>
-        <div class="score-bar-wrap"><div class="score-bar" style="width:${val}%;background:${color};"></div></div>
-        <span class="score-num" style="color:${color}">${val}</span></div>`;
-    }
-
-    document.getElementById('strengths-list').innerHTML =
-      (data.strengths || []).map(s => `<li><span class="dot"></span>${esc(s)}</li>`).join('');
-    document.getElementById('gaps-list').innerHTML =
-      (data.gaps || []).map(g => `<li><span class="dot"></span>${esc(g)}</li>`).join('');
-    document.getElementById('summary-text').textContent = data.summary;
-    showView('results-view');
-  }
-
-  // ── RENDER BATCH ──────────────────────────────────────
+  // ── BATCH RESULTS ─────────────────────────────────────
   function renderBatchResults() {
-    const results = lastBatchResults;
-    const advanced = results.filter(r => r.decision === 'ADVANCE').length;
-    const totalTime = results.reduce((sum, r) => sum + parseFloat(r.screening_time_seconds || 0), 0).toFixed(1);
-    const savedMin = Math.round((180 * results.length - totalTime) / 60);
+    const profile = getProfile(currentProfileId);
+    const candidates = (profile?.candidates || []).filter(c => lastBatchCandidateIds.includes(c.id));
+    const sorted = [...candidates].sort((a, b) => (b.resume_score || 0) - (a.resume_score || 0));
+
+    const passed = sorted.filter(c => (c.resume_score || 0) >= THRESHOLD).length;
+    const totalTime = sorted.reduce((s, c) => s + parseFloat(c.screening_time_seconds || 0), 0).toFixed(1);
+    const savedMin = Math.round((180 * sorted.length - totalTime) / 60);
 
     document.getElementById('batch-summary').innerHTML = `
-      <div class="batch-stat"><div class="num">${results.length}</div><div class="lbl">Screened</div></div>
-      <div class="batch-stat"><div class="num" style="color:#065f46">${advanced}</div><div class="lbl">Advance</div></div>
-      <div class="batch-stat"><div class="num" style="color:#991b1b">${results.length - advanced}</div><div class="lbl">Reject</div></div>
+      <div class="batch-stat"><div class="num">${sorted.length}</div><div class="lbl">Screened</div></div>
+      <div class="batch-stat"><div class="num" style="color:#1e40af">${passed}</div><div class="lbl">Passed (≥${THRESHOLD})</div></div>
+      <div class="batch-stat"><div class="num" style="color:#065f46">${sorted.filter(c=>c.decision==='ADVANCE').length}</div><div class="lbl">AI Advance</div></div>
       <div class="batch-stat"><div class="num">${totalTime}s</div><div class="lbl">Total Time</div></div>
-      <div class="batch-stat"><div class="num">~${savedMin}m</div><div class="lbl">Time Saved</div></div>`;
+      <div class="batch-stat"><div class="num">~${savedMin}m</div><div class="lbl">Saved</div></div>`;
 
-    const rankMedals = ['gold', 'silver', 'bronze'];
-    document.getElementById('rank-tbody').innerHTML = results.map((r, i) => {
-      const isAdv = r.decision === 'ADVANCE';
-      const overall = r.scores?.overall_fit ?? 0;
-      const medalClass = rankMedals[i] || '';
-      return `
-        <tr>
-          <td><span class="rank-num ${medalClass}">#${i + 1}</span></td>
-          <td style="font-weight:600;font-size:0.92rem;">${esc(r.candidateName)}</td>
-          <td><span class="decision-pill ${isAdv ? 'advance' : 'reject'}">${isAdv ? '✓ Advance' : '✗ Reject'}</span></td>
-          <td>
-            <span style="font-weight:700;color:${scoreColor(overall)}">${overall}</span>
-            <div class="mini-bar-wrap"><div class="mini-bar" style="width:${overall}%;background:${scoreColor(overall)};"></div></div>
-          </td>
-          <td style="color:${scoreColor(r.scores?.skills_match)}">${r.scores?.skills_match ?? '–'}</td>
-          <td style="color:${scoreColor(r.scores?.experience_level)}">${r.scores?.experience_level ?? '–'}</td>
-          <td style="color:${scoreColor(r.scores?.education_fit)}">${r.scores?.education_fit ?? '–'}</td>
-          <td><button class="expand-btn" onclick="toggleDetail(${i})">Details</button></td>
-        </tr>
-        <tr class="detail-row" id="detail-row-${i}">
-          <td colspan="8">
-            <div class="detail-panel" id="detail-panel-${i}">
-              <div class="detail-grid">
-                <div>
-                  <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin-bottom:8px;">Strengths</div>
-                  <ul class="bullet-list strengths">${(r.strengths||[]).map(s=>`<li><span class="dot"></span>${esc(s)}</li>`).join('')}</ul>
-                </div>
-                <div>
-                  <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin-bottom:8px;">Gaps</div>
-                  <ul class="bullet-list gaps">${(r.gaps||[]).map(g=>`<li><span class="dot"></span>${esc(g)}</li>`).join('')}</ul>
-                </div>
-              </div>
-              <div style="margin-top:12px;font-size:0.85rem;color:#374151;line-height:1.6;padding-top:12px;border-top:1px solid #e5e7eb;">${esc(r.summary)}</div>
-            </div>
-          </td>
-        </tr>`;
+    const medals = ['gold', 'silver', 'bronze'];
+    document.getElementById('rank-tbody').innerHTML = sorted.map((c, i) => {
+      const score = c.resume_score || 0;
+      const passes = score >= THRESHOLD;
+      const col = scoreColor(score);
+      return `<tr onclick="showCandidateProfile('${c.id}')">
+        <td><span class="rank-num ${medals[i] || ''}">#${i + 1}</span></td>
+        <td style="font-weight:600;font-size:0.92rem;">${esc(c.name)}</td>
+        <td><span style="font-weight:800;color:${col}">${score}</span>
+            <div class="mini-bar-wrap"><div class="mini-bar" style="width:${score}%;background:${col};"></div></div></td>
+        <td><span class="threshold-badge ${passes ? 'pass' : 'fail'}">${passes ? '✓ Pass' : '✗ Fail'}</span></td>
+        <td><span class="decision-pill ${c.decision === 'ADVANCE' ? 'advance' : 'reject'}">${c.decision}</span></td>
+        <td style="color:${scoreColor(c.scores?.skills_match)}">${c.scores?.skills_match ?? '–'}</td>
+        <td style="color:${scoreColor(c.scores?.experience_level)}">${c.scores?.experience_level ?? '–'}</td>
+        <td style="color:${scoreColor(c.scores?.education_fit)}">${c.scores?.education_fit ?? '–'}</td>
+      </tr>`;
     }).join('');
 
     showView('batch-results-view');
   }
 
-  function toggleDetail(i) {
-    const panel = document.getElementById(`detail-panel-${i}`);
-    const btn = panel.closest('tr').previousElementSibling.querySelector('.expand-btn');
-    const isOpen = panel.classList.toggle('open');
-    btn.textContent = isOpen ? 'Hide' : 'Details';
-  }
-
   // ── CSV EXPORT ────────────────────────────────────────
-  function exportSingleCSV() {
-    if (!lastSingleResult) return;
-    downloadCSV([lastSingleResult], `screening-${lastJobName}-${Date.now()}.csv`);
+  function exportCandidateCSV() {
+    const c = getCandidate(currentProfileId, currentCandidateId);
+    if (!c) return;
+    downloadCSV([c], `${slugify(c.name)}-screening.csv`);
   }
 
   function exportBatchCSV() {
-    if (!lastBatchResults.length) return;
-    downloadCSV(lastBatchResults, `batch-screening-${lastJobName}-${Date.now()}.csv`);
+    const profile = getProfile(currentProfileId);
+    const candidates = (profile?.candidates || []).filter(c => lastBatchCandidateIds.includes(c.id));
+    const sorted = [...candidates].sort((a, b) => (b.resume_score || 0) - (a.resume_score || 0));
+    downloadCSV(sorted, `batch-${slugify(profile?.name || 'job')}-${Date.now()}.csv`);
   }
 
   function downloadCSV(results, filename) {
-    const headers = ['Rank','Candidate','Decision','Confidence','Overall Fit','Skills Match','Experience','Education Fit','Decision Reason','Summary'];
-    const rows = results.map((r, i) => [
-      i + 1,
-      csvCell(r.candidateName || `Candidate ${i+1}`),
-      r.decision,
-      r.confidence,
-      r.scores?.overall_fit ?? '',
-      r.scores?.skills_match ?? '',
-      r.scores?.experience_level ?? '',
-      r.scores?.education_fit ?? '',
-      csvCell(r.decision_reason || ''),
-      csvCell(r.summary || ''),
+    const headers = ['Rank','Candidate','Resume Score','Passes Threshold','AI Decision','Human Status','Confidence','Skills Match','Experience','Education Fit','Overall Fit','Decision Reason','Summary'];
+    const rows = results.map((c, i) => [
+      i + 1, csvCell(c.name || ''), c.resume_score || 0,
+      (c.resume_score || 0) >= THRESHOLD ? 'Yes' : 'No',
+      c.decision, c.status, c.confidence,
+      c.scores?.skills_match ?? '', c.scores?.experience_level ?? '',
+      c.scores?.education_fit ?? '', c.scores?.overall_fit ?? '',
+      csvCell(c.decision_reason || ''), csvCell(c.summary || ''),
     ]);
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
+    const a = Object.assign(document.createElement('a'), { href: url, download: filename });
     a.click();
     URL.revokeObjectURL(url);
   }
 
-  function csvCell(str) {
-    return `"${String(str).replace(/"/g, '""')}"`;
-  }
-
-  // ── JOB CARDS ─────────────────────────────────────────
-  function saveProfile() {
-    const name = document.getElementById('profile-name').value.trim();
-    const jd = document.getElementById('profile-jd').value.trim();
-    const errBox = document.getElementById('create-error');
-    if (!name || !jd) {
-      errBox.textContent = 'Please fill in both the role title and job description.';
-      errBox.style.display = 'block';
-      return;
-    }
-    const profiles = getProfiles();
-    if (editingProfileId) {
-      const idx = profiles.findIndex(p => p.id === editingProfileId);
-      if (idx !== -1) { profiles[idx].name = name; profiles[idx].jobDescription = jd; }
-    } else {
-      profiles.push({
-        id: Date.now().toString(), name, jobDescription: jd,
-        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      });
-    }
-    saveProfiles(profiles);
-    showHome();
-  }
-
-  function deleteProfile(id, e) {
-    e.stopPropagation();
-    if (!confirm('Delete this job profile?')) return;
-    saveProfiles(getProfiles().filter(p => p.id !== id));
-    renderJobCards();
-  }
-
-  function renderJobCards() {
-    const profiles = getProfiles();
-    const grid = document.getElementById('jobs-grid');
-    if (!profiles.length) {
-      grid.innerHTML = `<div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <h3>No job profiles yet</h3>
-        <p>Create your first profile to start screening candidates.</p>
-        <button class="btn-primary" onclick="showCreate()">+ Create First Profile</button>
-      </div>`;
-      return;
-    }
-    grid.innerHTML = profiles.map(p => `
-      <div class="job-card" onclick="showScreen('${p.id}')">
-        <div class="job-card-top">
-          <div class="job-card-icon">💼</div>
-          <div class="job-card-actions">
-            <button class="btn-ghost" title="Edit" onclick="showCreate('${p.id}');event.stopPropagation()">✏️</button>
-            <button class="btn-ghost danger" title="Delete" onclick="deleteProfile('${p.id}',event)">🗑️</button>
-          </div>
-        </div>
-        <h3>${esc(p.name)}</h3>
-        <p>${esc(p.jobDescription.substring(0, 90))}...</p>
-        <div class="job-card-footer">
-          <span class="job-card-date">Created ${p.createdAt}</span>
-          <button class="screen-from-card-btn" onclick="showScreen('${p.id}');event.stopPropagation()">Screen Candidate →</button>
-        </div>
-      </div>`).join('');
-  }
-
   // ── HELPERS ───────────────────────────────────────────
-  function scoreColor(val) {
-    return val >= 70 ? '#10b981' : val >= 45 ? '#f59e0b' : '#ef4444';
+  function scoreColor(val) { return val >= 70 ? '#10b981' : val >= 45 ? '#f59e0b' : '#ef4444'; }
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function csvCell(s) { return `"${String(s).replace(/"/g,'""')}"`; }
+  function slugify(s) { return s.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''); }
+
+  function toggleResume() {
+    const el = document.getElementById('resume-text-display');
+    const btn = document.querySelector('.resume-toggle');
+    const isShown = el.style.display !== 'none';
+    el.style.display = isShown ? 'none' : 'block';
+    btn.textContent = isShown ? 'Show Resume Text' : 'Hide Resume Text';
   }
 
-  function esc(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function copySummary() {
-    navigator.clipboard.writeText(document.getElementById('summary-text').textContent).then(() => {
+  function copyCandidateSummary() {
+    navigator.clipboard.writeText(document.getElementById('candidate-summary').textContent).then(() => {
       const btn = document.querySelector('.copy-btn');
       btn.textContent = 'Copied!';
       setTimeout(() => btn.textContent = 'Copy to Clipboard', 2000);

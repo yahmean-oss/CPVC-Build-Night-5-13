@@ -37,6 +37,7 @@ Respond with ONLY valid JSON in this exact format:
 {
   "decision": "ADVANCE" or "REJECT",
   "confidence": "High", "Medium", or "Low",
+  "resume_score": <0-100 composite score weighted as: skills match 30%, experience relevance 25%, keyword/terminology alignment 15%, education fit 15%, career trajectory 10%, resume professionalism 5%. Be precise and critical.>,
   "summary": "One paragraph (3-4 sentences) the recruiter can paste into their notes.",
   "scores": {
     "skills_match": <0-100>,
